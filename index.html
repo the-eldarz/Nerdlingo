@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ХимБио</title>
+<style>
+:root{--bg:#fff;--tx:#4b4b4b;--bd:#e5e5e5;--mut:#afafaf;--g:#58cc02;--gd:#46a302;--b:#1cb0f6;--r:#ff4b4b}
+@media(prefers-color-scheme:dark){:root{--bg:#131f24;--tx:#dce6ea;--bd:#37464f;--mut:#6b7f88}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:800 16px Nunito,system-ui,sans-serif}
+#app{max-width:520px;margin:auto;padding:0 16px 110px}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 4px 12px;font-size:18px;border-bottom:2px solid var(--bd)}
+.fl{color:var(--mut)}.fl.on{color:#ff9600}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tabs button{flex:1;padding:10px;border-radius:14px;border:2px solid var(--bd);border-bottom-width:4px;background:var(--bg);color:var(--mut);font-size:15px;text-transform:uppercase}
+.tabs .on{border-color:var(--b);background:rgba(28,176,246,.15);color:var(--b)}
+.warn{background:rgba(255,150,0,.15);color:#ff9600;border-radius:14px;padding:12px 14px;margin-bottom:6px}
+.ban{border-radius:16px;padding:14px 16px;color:#fff;margin:24px 0 8px}
+.ban small{opacity:.85;font-size:13px}.ban h2{margin:2px 0 0;font-size:21px}
+.nd{display:block;width:72px;height:66px;border-radius:50%;border:0;font-size:28px;color:#fff;margin:34px auto 12px;position:relative}
+.nd:active{transform:translateY(5px);box-shadow:none!important}
+.nd.lk{background:#e5e5e5!important;box-shadow:0 6px 0 #b7b7b7!important;color:#afafaf;cursor:default}
+.go{position:absolute;top:-40px;left:50%;transform:translateX(-50%);background:var(--bg);color:var(--g);border:2px solid var(--bd);border-radius:12px;padding:4px 10px;font-size:14px;white-space:nowrap;animation:bn 1s infinite alternate}
+@keyframes bn{to{top:-46px}}
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:6px;background:var(--bg);border-top:2px solid var(--bd);padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.nav button{background:none;border:0;font-size:28px;opacity:.45;padding:4px 14px;border-radius:12px}
+.nav .on{opacity:1;background:rgba(28,176,246,.15)}
+body.les .nav{display:none}
+.lh{display:flex;align-items:center;gap:14px;padding:calc(16px + env(safe-area-inset-top)) 0 6px}
+.bar{flex:1;height:16px;background:var(--bd);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--g);border-radius:9px;transition:width .3s}
+.x{background:none;border:0;font-size:26px;color:var(--mut)}
+.q{font-size:24px;margin:24px 0}.rv{color:var(--b);font-size:13px}
+.opt{display:block;width:100%;text-align:left;padding:14px 16px;margin:10px 0;border:2px solid var(--bd);border-bottom-width:4px;border-radius:16px;background:var(--bg);color:var(--tx);font-size:17px}
+.opt.sel{border-color:var(--b);background:rgba(28,176,246,.15);color:var(--b)}
+.opt.ok{border-color:var(--g);background:rgba(88,204,2,.15);color:var(--g)}
+.opt.no{border-color:var(--r);background:rgba(255,75,75,.15);color:var(--r)}
+.opt.dn{opacity:.3;pointer-events:none}
+.cols{display:flex;gap:12px}.cols>div{flex:1}
+.shk{animation:sk .4s}@keyframes sk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.in{width:100%;padding:14px;border:2px solid var(--bd);border-radius:16px;background:rgba(128,128,128,.1);color:var(--tx);font:inherit;font-size:18px}
+#ft{position:fixed;left:0;right:0;bottom:0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));border-top:2px solid var(--bd);background:var(--bg)}
+#ft.g{box-shadow:inset 0 0 0 999px rgba(88,204,2,.18);color:var(--g)}
+#ft.r{box-shadow:inset 0 0 0 999px rgba(255,75,75,.18);color:var(--r)}
+.btn{display:block;width:100%;max-width:488px;margin:auto;padding:15px;border:0;border-radius:16px;background:var(--g);box-shadow:0 4px 0 var(--gd);color:#fff;font-size:16px;text-transform:uppercase;letter-spacing:.8px}
+.btn:disabled{background:var(--bd);box-shadow:0 4px 0 #b7b7b7;color:var(--mut)}
+.btn.red{background:var(--r);box-shadow:0 4px 0 #ea2b2b}
+.btn.gh{background:none;box-shadow:none;color:var(--b);margin-top:6px}
+.ctr{text-align:center;padding-top:90px}.ctr .big{font-size:84px}.ctr h1{margin:10px 0}
+.st{display:flex;gap:10px;justify-content:center;margin:24px 0}
+.st div{flex:1;border:2px solid var(--bd);border-radius:14px;padding:10px 4px;font-size:20px}.st small{display:block;color:var(--mut);font-size:12px}
+.card{border:2px solid var(--bd);border-radius:16px;padding:16px;margin:16px 0}
+.wk{display:flex;justify-content:space-between;margin-top:12px;text-align:center;font-size:13px;color:var(--mut)}
+.wk b{display:block;width:34px;height:34px;line-height:34px;border-radius:50%;background:var(--bd);color:#fff;margin-top:4px;font-size:16px}
+.wk b.on{background:#ff9600}
+.pb{height:14px;background:var(--bd);border-radius:8px;overflow:hidden;margin-top:8px}.pb i{display:block;height:100%;background:#ffc800}
+.chip{display:inline-block;margin:5px;padding:10px 14px;border:2px solid var(--bd);border-bottom-width:4px;border-radius:14px;background:var(--bg);color:var(--tx);font-size:18px}
+.chip.dn{opacity:.25;pointer-events:none}
+.ans{min-height:72px;border-top:2px solid var(--bd);border-bottom:2px solid var(--bd);padding:6px 0;margin-bottom:20px}
+.mod{margin:26px 0 -10px;color:var(--mut);font-size:14px;text-transform:uppercase;letter-spacing:1px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--bg);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet .btn{margin:8px 0}.btn.gld{background:#ffc800;box-shadow:0 4px 0 #e5a800;color:#7a5a00}
+.ctr2{text-align:center;background:var(--bg);padding:24px;border-radius:24px;width:90%;max-width:380px}
+.qc{display:flex;gap:14px;align-items:center}.cb{text-align:center}.cb small{display:block;font-size:11px;color:var(--mut)}.rd{display:block;color:var(--g);font-size:12px}
+.shake{display:inline-block;animation:shk2 .5s infinite}@keyframes shk2{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.lid{transform-origin:15px 45px;transition:transform .5s}.lid.op{transform:rotate(-70deg)}
+.glow{filter:drop-shadow(0 0 28px #ffc800)}
+.pop{display:inline-block;animation:pop .6s}@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.top span{cursor:pointer}.av{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:22px}.av.big{width:120px;height:120px;font-size:68px}
+.qb{background:#8e69d0;color:#fff;border-radius:18px;padding:18px;margin-top:14px}.qb h2{margin:0 0 4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;color:var(--mut)}
+.cal b{display:block;width:34px;height:34px;line-height:34px;margin:auto;border-radius:50%;font-size:15px}.cal b.on{background:#ff9600;color:#fff}.cal b.td{outline:2px solid var(--b)}
+.dot{width:34px;height:34px;border-radius:50%;border:3px solid var(--bd);margin:6px 4px}
+.bd{display:inline-block;width:76px;text-align:center;margin:6px 2px;font-size:12px}.bd i{display:block;width:60px;height:60px;line-height:60px;margin:0 auto 4px;border-radius:50%;font-style:normal;font-size:30px;background:#ffc800}.bd.lk i{background:var(--bd);filter:grayscale(1);opacity:.5}
+:root[data-th=light]{--bg:#fff;--tx:#4b4b4b;--bd:#e5e5e5;--mut:#afafaf}:root[data-th=dark]{--bg:#131f24;--tx:#dce6ea;--bd:#37464f;--mut:#6b7f88}
+.el{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.e{border:2px solid var(--bd);border-bottom-width:4px;border-radius:12px;background:var(--bg);color:var(--tx);padding:6px 0;font:inherit;font-size:13px}.e b{display:block;font-size:20px}
+.nd.cur::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:5px solid var(--rc);animation:pl 1.4s ease-in-out infinite}@keyframes pl{0%{transform:scale(.92);opacity:1}100%{transform:scale(1.12);opacity:.15}}
+.lst{border:2px solid var(--bd);border-radius:16px;overflow:hidden}.rw{padding:16px;border-bottom:2px solid var(--bd);display:flex;justify-content:space-between;align-items:center;cursor:pointer}.rw:last-child{border:0}
+.sw{width:48px;height:28px;border-radius:14px;background:var(--bd);position:relative}.sw.on{background:#49c0f8}.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s}.sw.on::after{left:23px}
+h3{margin:22px 0 10px}.noanim *{animation:none!important;transition:none!important}
+.sb{position:fixed;left:16px;right:16px;max-width:488px;margin:0 auto;top:var(--th,62px);z-index:4}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#222;color:#fff;padding:12px 18px;border-radius:14px;z-index:40;max-width:85%;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="nav"><button onclick="home()">🏠</button><button onclick="quests()">🧰</button><button onclick="league()">🏆</button><button onclick="feed()">💬</button><button onclick="shop()">💎</button><button onclick="more()">⋯</button></div><div id="pp"></div>
+<script>
+// ===== Контент: q = [вопрос, [варианты], индекс] | [вопрос, 'ответ1|ответ2'] | ['m', [[левое, правое],...]]
+// s: 0 = Химия, 1 = Биология. Добавляй темы в конец массива U.
+const SEC=['Химия','Биология'];
+const U=[
+{s:0,M:'Строение вещества',c:'#58cc02',d:'#46a302',n:'Атомы и частицы',q:[
+['Какая частица в ядре атома заряжена положительно?',['Электрон','Протон','Нейтрон'],1],
+['Какая частица не имеет заряда?',['Протон','Электрон','Нейтрон'],2],
+['Какой заряд у электрона?',['Положительный','Отрицательный','Нулевой'],1],
+['Что определяет порядковый номер элемента?',['Число нейтронов','Число протонов','Массу молекулы'],1],
+['Сколько протонов в атоме углерода (C)?','6'],
+['m',[['Протон','Положительный'],['Электрон','Отрицательный'],['Нейтрон','Нейтральный']]],
+['Из чего состоит атомное ядро?',['Протоны и нейтроны','Протоны и электроны','Только электроны'],0],
+['Атом, потерявший электрон, становится…',['Анионом','Катионом','Нейтральным'],1],
+['b','Собери формулу воды',['H','₂','O'],['C','₃'],''],
+['b','Собери формулу углекислого газа',['C','O','₂'],['H','₃'],'']]},
+{s:0,c:'#1cb0f6',d:'#1899d6',n:'Периодическая таблица',q:[
+['Кто создал периодическую таблицу элементов?',['Менделеев','Ломоносов','Бор'],0],
+['Горизонтальные ряды таблицы называются…',['Группами','Периодами','Семействами'],1],
+['Вертикальные столбцы таблицы называются…',['Группами','Периодами','Рядами'],0],
+['Напиши символ кислорода','O|О'],
+['m',[['Na','Натрий'],['Fe','Железо'],['Au','Золото']]],
+['Элементы одной группы имеют схожие…',['Химические свойства','Массы','Цвета'],0],
+['Какой газ самый лёгкий?',['Гелий','Водород','Азот'],1],
+['Напиши символ железа','Fe'],
+['b','Собери формулу поваренной соли',['Na','Cl'],['Cl₂','K'],''],
+['b','Собери формулу серной кислоты',['H₂','S','O₄'],['N','O₂'],'']]},
+{s:1,M:'Основы жизни',c:'#ce82ff',d:'#a568cc',n:'Клетка',q:[
+['Какая органелла — «энергетическая станция» клетки?',['Ядро','Митохондрия','Рибосома'],1],
+['Где у эукариот хранится ДНК?',['В ядре','В вакуоли','В лизосоме'],0],
+['Что есть только у растительной клетки?',['Митохондрии','Клеточная стенка','Ядро'],1],
+['m',[['Рибосома','Синтез белка'],['Хлоропласт','Фотосинтез'],['Ядро','Хранение ДНК']]],
+['Как называется деление клетки на две одинаковые?','митоз'],
+['Что делает клеточная мембрана?',['Регулирует вход и выход веществ','Синтезирует белок','Хранит ДНК'],0],
+['Бактерии — это…',['Эукариоты','Прокариоты','Вирусы'],1],
+['Как называется органелла, где идёт фотосинтез?','хлоропласт|хлоропласты'],
+['b','Расставь этапы митоза по порядку',['Профаза','Метафаза','Анафаза','Телофаза'],[],' → '],
+['b','Расставь по порядку: от простого к сложному',['Клетка','Ткань','Орган','Организм'],[],' → ']]},
+{s:1,c:'#ff9600',d:'#cc7800',n:'ДНК и гены',q:[
+['ДНК — это…',['Белок','Молекула наследственной информации','Углевод'],1],
+['Какие нуклеотиды входят в ДНК?',['A, T, G, C','A, U, G, C','A, T, K, C'],0],
+['С каким нуклеотидом в ДНК образует пару аденин (A)?',['G','T','C'],1],
+['Какую форму имеет ДНК?',['Одна нить','Двойная спираль','Кольцо из белка'],1],
+['Как называется единица наследственной информации?','ген'],
+['m',[['ДНК','Двойная спираль'],['РНК','Содержит урацил'],['Ген','Участок ДНК']]],
+['Где у человека находится большая часть ДНК?',['В ядре клетки','В плазме крови','В костях'],0],
+['Сколько хромосом в клетке тела человека?',['23','46','64'],1],
+['b','Как информация из гена становится белком?',['ДНК','РНК','Белок'],[],' → '],
+['b','Расставь по размеру: от малого к большому',['Нуклеотид','Ген','Хромосома','Клетка'],[],' → ']]},
+// ---- Химия, модуль 2: Химические связи и вещества
+{s:0,M:'Химические связи и вещества',c:'#ff9600',d:'#cc7800',n:'Химические связи',q:[
+['Ионная связь возникает между…',['металлом и неметаллом','двумя одинаковыми неметаллами','двумя металлами'],0],
+['Ковалентная связь образуется за счёт…',['общих электронных пар','передачи протонов','притяжения молекул'],0],
+['Какая связь в молекуле O₂?',['Ионная','Ковалентная неполярная','Металлическая'],1],
+['Какая связь в NaCl?',['Ионная','Ковалентная','Водородная'],0],
+['Сколько электронов на внешнем уровне у галогенов?','7'],
+['m',[['NaCl','Ионная'],['H₂','Ковалентная неполярная'],['Fe','Металлическая']]],
+['Молекула воды — это…',['полярная молекула','неполярная молекула','ион'],0],
+['Водородные связи между молекулами воды объясняют…',['высокую температуру кипения воды','цвет воды','её запах'],0],
+['b','Собери формулу аммиака',['N','H₃'],['O','H₂'],''],
+['b','Собери формулу метана',['C','H₄'],['O','H₂'],'']]},
+{s:0,c:'#ce82ff',d:'#a568cc',n:'Классы веществ',q:[
+['К оксидам относится…',['CO₂','NaOH','HCl'],0],
+['К кислотам относится…',['H₂SO₄','NaCl','KOH'],0],
+['К основаниям относится…',['NaOH','HNO₃','CaO'],0],
+['К солям относится…',['NaCl','CO₂','H₂SO₄'],0],
+['Как в быту называют NaCl?','поваренная соль|соль'],
+['m',[['CaO','Оксид'],['HCl','Кислота'],['KOH','Основание']]],
+['Простое вещество состоит из атомов…',['одного элемента','разных элементов','только металлов'],0],
+['Какое вещество простое?',['O₂','H₂O','CO₂'],0],
+['b','Собери формулу гидроксида натрия',['Na','OH'],['H₂','Cl'],''],
+['b','Собери формулу соляной кислоты',['H','Cl'],['Na','O₂'],'']]},
+// ---- Химия, модуль 3: Реакции и растворы
+{s:0,M:'Реакции и растворы',c:'#ff86d0',d:'#cc6ba6',n:'Химические реакции',q:[
+['Что сохраняется в ходе реакции?',['Общая масса веществ','Число молекул','Объём'],0],
+['Закон сохранения массы сформулировал…',['Ломоносов','Дарвин','Ньютон'],0],
+['Признак химической реакции…',['выделение газа или осадок','изменение формы сосуда','высыхание лужи'],0],
+['2H₂ + O₂ → 2H₂O — это реакция…',['соединения','разложения','замещения'],0],
+['Какой газ выделяется при реакции цинка с соляной кислотой?','водород|h2|h₂'],
+['m',[['Соединение','A + B → AB'],['Разложение','AB → A + B'],['Замещение','A + BC → AC + B']]],
+['Катализатор…',['ускоряет реакцию и не расходуется','останавливает реакцию','входит в продукты'],0],
+['Экзотермическая реакция…',['выделяет тепло','поглощает тепло','идёт без энергии'],0],
+['b','Собери уравнение горения водорода',['2H₂','+','O₂','→','2H₂O'],['H₂O₂'],' '],
+['b','Собери уравнение разложения воды',['2H₂O','→','2H₂','+','O₂'],['H₂O₂'],' ']]},
+{s:0,c:'#00cd9c',d:'#00a67e',n:'Кислоты, основания, растворы',q:[
+['pH = 7 соответствует…',['нейтральной среде','кислой среде','щелочной среде'],0],
+['Кислая среда имеет pH…',['меньше 7','равный 7','больше 7'],0],
+['Фенолфталеин в щёлочи становится…',['малиновым','синим','жёлтым'],0],
+['Раствор — это…',['однородная смесь','чистое вещество','оксид'],0],
+['Как называется растворитель в водном растворе?','вода'],
+['m',[['pH < 7','Кислота'],['pH = 7','Нейтральная среда'],['pH > 7','Щёлочь']]],
+['При реакции кислоты с основанием образуются…',['соль и вода','газ и осадок','два оксида'],0],
+['Лимонный сок имеет…',['кислую среду','щелочную среду','нейтральную среду'],0],
+['b','Допиши продукты: HCl + NaOH →',['NaCl','+','H₂O'],['Na₂O'],' '],
+['b','Расставь по возрастанию pH',['Лимонный сок','Вода','Мыло'],[],' → ']]},
+// ---- Химия, модуль 4: Органика и расчёты
+{s:0,M:'Органика и расчёты',c:'#1cb0f6',d:'#1899d6',n:'Основы органики',q:[
+['Основа органических соединений — атомы…',['углерода','азота','железа'],0],
+['Простейший углеводород…',['метан','этанол','глюкоза'],0],
+['Формула метана…',['CH₄','C₂H₆','CO₂'],0],
+['Этанол относится к…',['спиртам','кислотам','алканам'],0],
+['Сколько связей образует атом углерода?','4'],
+['m',[['CH₄','Метан'],['C₂H₅OH','Этанол'],['C₆H₁₂O₆','Глюкоза']]],
+['Что образуется при полном сгорании углеводородов?',['CO₂ и H₂O','только сажа','CO и водород'],0],
+['Основной компонент природного газа…',['метан','гелий','пропанол'],0],
+['b','Собери формулу этана',['C₂','H₆'],['H₄','O'],''],
+['b','Расставь по числу атомов углерода',['Метан','Этан','Пропан','Бутан'],[],' → ']]},
+{s:0,c:'#ff4b4b',d:'#cc3c3c',n:'Моль и расчёты',q:[
+['Число Авогадро равно…',['6,02·10²³','3,14','9,8'],0],
+['Моль — единица…',['количества вещества','массы','объёма'],0],
+['Молярная масса воды H₂O (г/моль)…',['18','10','2'],0],
+['Объём 1 моль газа при н.у. (л)…',['22,4','11,2','44,8'],0],
+['Чему равна молярная масса CO₂ (г/моль)?','44'],
+['m',[['H₂','2 г/моль'],['O₂','32 г/моль'],['CO₂','44 г/моль']]],
+['Сколько моль в 36 г воды?',['2','1','18'],0],
+['Массовая доля — это…',['отношение массы вещества к массе смеси','число молекул','объём газа'],0],
+['b','Собери формулу количества вещества n',['m','/','M'],['V','×'],''],
+['b','Расставь по возрастанию молярной массы',['H₂','H₂O','O₂','CO₂'],[],' → ']]},
+// ---- Химия, модуль 5: Металлы и неметаллы
+{s:0,M:'Металлы и неметаллы',c:'#ff9600',d:'#cc7800',n:'Металлы',q:[
+['Какой металл жидкий при комнатной температуре?',['Ртуть','Железо','Золото'],0,'Ртуть плавится при −39 °C'],
+['Металлы обычно…',['хорошо проводят ток','не проводят ток','хрупкие газы'],0],
+['Самый распространённый металл в земной коре…',['алюминий','золото','медь'],0],
+['Сплав железа с углеродом…',['сталь','бронза','латунь'],0],
+['Бронза — сплав меди и…',['олова','цинка','свинца'],0,'Медь + олово = бронза'],
+['Напиши символ меди','Cu'],
+['m',[['Fe','Железо'],['Zn','Цинк'],['Al','Алюминий']]],
+['Ржавление — взаимодействие железа с…',['кислородом и влагой','азотом','гелием'],0,'Fe + O₂ + H₂O → ржавчина'],
+['b','Расставь по активности: от активного к менее',['Калий','Железо','Медь','Золото'],[],' → ','Чем левее в ряду активности, тем активнее'],
+['Самая высокая электропроводность после серебра у…',['меди','свинца','железа'],0],
+['Щелочные металлы бурно реагируют с…',['водой','гелием','песком'],0],
+['Оксид Fe₂O₃ — это…',['ржавчина','сода','известь'],0]]},
+{s:0,c:'#00cd9c',d:'#00a67e',n:'Неметаллы',q:[
+['Какой неметалл — жидкость при н.у.?',['Бром','Хлор','Сера'],0],
+['Галогены находятся в группе…',['VII','I','VIII'],0,'Фтор, хлор, бром, иод'],
+['Алмаз и графит — формы…',['углерода','кремния','серы'],0,'Это аллотропные модификации'],
+['Какой газ необходим для дыхания?',['O₂','N₂','Ne'],0],
+['Озон — это…',['O₃','O₂','CO₂'],0],
+['Напиши символ серы','S'],
+['m',[['N₂','Азот, 78% воздуха'],['O₂','Кислород, 21%'],['Ar','Аргон']]],
+['Основная часть воздуха — это…',['азот','кислород','углекислый газ'],0],
+['b','Собери формулу сернистого газа',['S','O₂'],['H','Cl'],'','SO₂ — сернистый газ'],
+['Хлор в воде применяют для…',['обеззараживания','окрашивания','охлаждения'],0],
+['Иод в медицине используют как…',['антисептик','витамин','газ'],0],
+['Благородные газы почти не реагируют, потому что…',['внешний уровень завершён','они тяжёлые','они жидкие'],0,'Завершённый внешний электронный уровень']]},
+{s:0,M:'Продвинутая химия',c:'#ce82ff',d:'#a568cc',n:'Окислительно-восстановительные реакции',q:[
+['Окислитель — вещество, которое…',['принимает электроны','отдаёт электроны','не меняется'],0,'Окислитель сам восстанавливается'],
+['Восстановитель…',['отдаёт электроны','принимает электроны','ускоряет реакцию'],0],
+['Степень окисления кислорода в оксидах обычно…',['−2','+2','0'],0],
+['Степень окисления простого вещества…',['0','+1','−1'],0],
+['Горение — это пример…',['окисления','нейтрализации','растворения'],0],
+['Чему равна степень окисления Na в NaCl?','+1|1'],
+['m',[['Окисление','Отдача электронов'],['Восстановление','Принятие электронов'],['Ржавление','Окислительный процесс']]],
+['При электролизе воды на катоде выделяется…',['водород','кислород','хлор'],0,'На катоде идёт восстановление'],
+['b','Расставь: окисление повышает степень окисления',['Fe⁰','Fe²⁺','Fe³⁺'],[],' → '],
+['Типичный восстановитель…',['натрий','фтор','кислород'],0],
+['Гальванический элемент превращает химическую энергию в…',['электрическую','только тепловую','только световую'],0],
+['Степень окисления S в H₂SO₄…',['+6','+4','−2'],0]]},
+// ---- Биология, модуль 2: Обмен веществ
+{s:1,M:'Обмен веществ',c:'#ff9600',d:'#cc7800',n:'Обмен веществ и ферменты',q:[
+['Ферменты — это…',['белки-катализаторы','жиры','витамины'],0,'Ускоряют реакции в клетке'],
+['Фотосинтез идёт в…',['хлоропластах','митохондриях','ядре'],0],
+['Что поглощают растения при фотосинтезе?',['CO₂','O₂','N₂'],0],
+['Клеточное дыхание идёт в…',['митохондриях','рибосомах','вакуолях'],0],
+['Главный источник энергии для клетки…',['глюкоза','вода','соль'],0],
+['Как называется расщепление веществ с выделением энергии?','катаболизм|диссимиляция'],
+['m',[['Фотосинтез','Свет → глюкоза'],['Дыхание','Глюкоза → АТФ'],['Брожение','Без кислорода']]],
+['Витамины нужны организму…',['в малых количествах','как строительный материал','вместо воды'],0],
+['b','Допиши уравнение фотосинтеза: CO₂ + H₂O →',['C₆H₁₂O₆','+','O₂'],['N₂'],' '],
+['Белки расщепляются до…',['аминокислот','глюкозы','жирных кислот'],0],
+['Какой орган вырабатывает желчь?',['печень','желудок','почки'],0],
+['Фермент слюны, расщепляющий крахмал…',['амилаза','пепсин','липаза'],0,'Переваривание крахмала начинается во рту']]},
+{s:1,M:'Наследственность',c:'#58cc02',d:'#46a302',n:'Генетика Менделя',q:[
+['Кто основатель генетики?',['Мендель','Дарвин','Павлов'],0],
+['Доминантный признак…',['проявляется у гибрида','скрыт у гибрида','исчезает'],0,'Доминантный подавляет рецессивный'],
+['Рецессивный признак проявляется при генотипе…',['aa','Aa','AA'],0],
+['Генотип Aa называется…',['гетерозиготным','гомозиготным','рецессивным'],0],
+['Сколько хромосом в половой клетке человека?','23','46 в соматической, 23 в половой'],
+['m',[['AA','Доминантная гомозигота'],['Aa','Гетерозигота'],['aa','Рецессивная гомозигота']]],
+['При скрещивании Aa × Aa доминантный признак у…',['75% потомков','25% потомков','100% потомков'],0,'Расщепление 3:1'],
+['Объект опытов Менделя…',['горох','мушка','мышь'],0],
+['b','Расставь порядок: от гена к признаку',['Ген','Белок','Признак'],[],' → '],
+['Генотип — это…',['набор генов организма','внешний вид','число клеток'],0],
+['Фенотип — это…',['внешние признаки','набор хромосом','молекула ДНК'],0],
+['Пример множественного аллелизма…',['группы крови','клонирование','митоз'],0]]},
+{s:1,M:'Организмы и среда',c:'#1cb0f6',d:'#1899d6',n:'Эволюция и экосистемы',q:[
+['Автор теории естественного отбора…',['Дарвин','Мендель','Линней'],0],
+['Движущая сила эволюции…',['естественный отбор','ветер','возраст'],0],
+['Продуценты в экосистеме — это…',['растения','хищники','паразиты'],0,'Создают органику из неорганики'],
+['Консументы…',['питаются готовой органикой','производят органику','разлагают минералы'],0],
+['Редуценты…',['разлагают остатки','охотятся','фотосинтезируют'],0],
+['Как называется совокупность организмов и среды их обитания?','экосистема'],
+['m',[['Продуценты','Растения'],['Консументы','Животные'],['Редуценты','Бактерии и грибы']]],
+['Пищевая цепь начинается с…',['продуцентов','хищников','редуцентов'],0],
+['b','Собери пищевую цепь',['Трава','Заяц','Лиса'],['Берёза'],' → '],
+['Вид — это группа особей, которые…',['дают плодовитое потомство','живут в одном стаде','все хищники'],0],
+['Приспособленность — результат…',['естественного отбора','обучения','погоды'],0],
+['Главный парниковый газ…',['CO₂','He','Ar'],0]]}
+];
+
+// ---- Ещё по 6 заданий в каждый раздел: уроки 1–3 берут задания 1–12, экзамен — 13–16 (новые) + 2 повтора
+[ // 0 Атомы
+[['Электроны движутся вокруг ядра по…',['энергетическим уровням','прямой линии','только внутри ядра'],0],
+['Масса атома сосредоточена в…',['ядре','электронной оболочке','пустоте'],0],
+['Атомы одного элемента с разным числом нейтронов — это…',['изотопы','ионы','молекулы'],0],
+['Сколько электронов в нейтральном атоме азота (N)?','7'],
+['m',[['Катион','Положительный ион'],['Анион','Отрицательный ион'],['Изотоп','Разное число нейтронов']]],
+['Самая лёгкая частица атома…',['электрон','протон','нейтрон'],0]],
+[ // 1 Периодическая таблица
+['Металлы в таблице чаще находятся…',['слева и в центре','в правом верхнем углу','только внизу'],0],
+['Благородные газы находятся в группе…',['VIII (18)','I','VII'],0],
+['Какой элемент — щелочной металл?',['Натрий','Хлор','Кремний'],0],
+['Напиши символ натрия','Na'],
+['m',[['H','Водород'],['C','Углерод'],['Cl','Хлор']]],
+['Номер периода равен числу…',['электронных уровней','протонов','нейтронов'],0]],
+[ // 2 Клетка
+['Какая органелла содержит хлорофилл?',['Хлоропласт','Митохондрия','Лизосома'],0],
+['Рибосомы нужны для…',['синтеза белка','фотосинтеза','хранения ДНК'],0],
+['Клетки без оформленного ядра — это…',['прокариоты','эукариоты','ткани'],0],
+['Как называется жидкая внутренняя среда клетки?','цитоплазма'],
+['m',[['Лизосома','Расщепление веществ'],['Вакуоль','Запас воды'],['Митохондрия','Выработка АТФ']]],
+['«Энергетическая валюта» клетки — это…',['АТФ','ДНК','Глюкоза'],0]],
+[ // 3 ДНК
+['Какой нуклеотид есть в РНК, но нет в ДНК?',['Урацил','Тимин','Аденин'],0],
+['Удвоение ДНК называется…',['репликацией','транскрипцией','митозом'],0],
+['Генетический код записан последовательностью…',['нуклеотидов','аминокислот','липидов'],0],
+['Какая нуклеиновая кислота содержит урацил? (аббревиатура)','рнк'],
+['m',[['Репликация','Удвоение ДНК'],['Транскрипция','ДНК → РНК'],['Трансляция','РНК → белок']]],
+['Совокупность всех генов организма называется…',['геном','хромосома','клетка'],0]],
+[ // 4 Связи
+['В какой молекуле тройная связь?',['N₂','O₂','H₂'],0],
+['Металлическая связь обеспечивает…',['электропроводность металлов','кислый вкус','газообразное состояние'],0],
+['Кристаллы NaCl имеют решётку…',['ионную','молекулярную','атомную'],0],
+['Сколько общих электронных пар в молекуле H₂?','1'],
+['m',[['N₂','Тройная связь'],['O₂','Двойная связь'],['H₂','Одинарная связь']]],
+['Растворы веществ с ионной связью…',['проводят ток','не проводят ток','горят'],0]],
+[ // 5 Классы веществ
+['CaO в быту называют…',['негашёная известь','сода','мел'],0],
+['Кислотный оксид — это…',['CO₂','Na₂O','CaO'],0],
+['Щёлочь — это…',['растворимое основание','кислотный оксид','соль'],0],
+['Напиши формулу углекислого газа','CO₂|CO2'],
+['m',[['H₂SO₄','Серная кислота'],['HNO₃','Азотная кислота'],['H₂CO₃','Угольная кислота']]],
+['Пищевая сода имеет формулу…',['NaHCO₃','NaCl','CaCO₃'],0]],
+[ // 6 Реакции
+['Реакция обмена выглядит как…',['AB + CD → AD + CB','A + B → AB','AB → A + B'],0],
+['Коэффициент в уравнении показывает…',['число молекул (молей)','заряд','массу атома'],0],
+['Ржавление железа — это…',['химическая реакция','физическое явление','плавление'],0],
+['Сколько атомов кислорода в 2H₂O?','2'],
+['m',[['Горение','Выделяется тепло и свет'],['Ржавление','Окисление железа'],['Фотосинтез','Образуется глюкоза']]],
+['При нагревании скорость большинства реакций…',['растёт','падает','не меняется'],0]],
+[ // 7 Кислоты, основания, растворы
+['Какая среда у раствора соды?',['щелочная','кислая','строго нейтральная'],0],
+['Универсальный индикатор в кислоте…',['краснеет','синеет','остаётся бесцветным'],0],
+['Концентрация раствора показывает…',['долю растворённого вещества','цвет раствора','массу сосуда'],0],
+['Как называется реакция кислоты с основанием?','нейтрализация'],
+['m',[['HCl','Соляная кислота'],['NaOH','Едкий натр'],['NaCl','Поваренная соль']]],
+['Раствор с pH 12 — это…',['сильная щёлочь','слабая кислота','нейтральный раствор'],0]],
+[ // 8 Органика
+['Общая формула алканов…',['CₙH₂ₙ₊₂','CₙH₂ₙ','CₙHₙ'],0],
+['Какой газ выделяется при брожении глюкозы?',['CO₂','He','Cl₂'],0],
+['Функциональная группа спиртов…',['–OH','–COOH','–NH₂'],0],
+['Сколько атомов водорода в метане CH₄?','4'],
+['m',[['–OH','Спирты'],['–COOH','Карбоновые кислоты'],['–NH₂','Амины']]],
+['Уксусная кислота относится к…',['карбоновым кислотам','спиртам','алканам'],0]],
+[ // 9 Моль
+['Сколько молекул в 1 моль вещества?',['6,02·10²³','22,4','18'],0],
+['Масса 1 моль O₂ (г)…',['32','16','8'],0],
+['Какой объём занимают 2 моль газа при н.у. (л)?',['44,8','22,4','11,2'],0],
+['Молярная масса NaCl (г/моль) примерно…','58|58,5'],
+['m',[['n','Количество вещества'],['M','Молярная масса'],['V','Объём']]],
+['Формула массы: m = …',['n·M','n/M','M/n'],0]]
+].forEach((a,i)=>U[i].q.push(...a));
+
+// ===== Состояние и серия (streak)
+const $=s=>document.querySelector(s);
+const T=n=>new Date(Date.now()-n*864e5).toLocaleDateString('en-CA');
+let S;try{S=JSON.parse(localStorage.getItem('cb'))}catch(e){}
+S=S||{xp:0,streak:0,best:0,last:'',done:{},hist:{},sec:0,gem:0,fz:0,gold:{},jmp:{}};
+// пропустил день (последний урок не сегодня и не вчера) — серия сбрасывается
+S.gem=S.gem||0;S.fz=S.fz||0;S.gold=S.gold||{};S.jmp=S.jmp||{};S.since=S.since||T(0);
+let note='';
+if(S.last&&S.last!==T(0)&&S.streak>0){
+ const miss=Math.round((new Date(T(0))-new Date(S.last))/864e5)-1;
+ if(miss>0){if(S.fz>=miss){S.fz-=miss;S.last=T(1);note='❄️ Заморозка спасла твой ударный режим!'}else S.streak=0}
+}
+const Q=()=>{if(!S.q||S.q.d!==T(0))S.q={d:T(0),xp:0,les:0,ok:0,c:0};return S.q};
+const QS=[['Пройди 2 урока','les',2],['Набери 40 XP','xp',40],['Ответь верно на 15 вопросов','ok',15]];
+const CH=[['#b9732f','#7a4720','Деревянный'],['#cfd8e0','#8d9aa6','Серебряный'],['#ffc800','#e5a800','Золотой']];
+const LVN=['Начинаем','Основы','Уверенный уровень','Продвинутый','Знаток','Мастер'];
+const lv=n=>{const m=17*U.filter(u=>u.s==n).length,t=[...new Set([5,10,20,Math.round(m*.4),Math.round(m*.7),m])].filter(x=>x<=m).sort((a,b)=>a-b);return t.map((x,k)=>[x,LVN[Math.min(k,5)]])};
+try{const m={name:'ХимБио',short_name:'ХимБио',display:'standalone',start_url:location.href,background_color:'#131f24',theme_color:'#58cc02',icons:[]};const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));document.head.appendChild(l)}catch(e){}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.dp=e});
+const save=()=>{try{localStorage.setItem('cb',JSON.stringify(S))}catch(e){}};
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const isC=q=>q[0]!='m'&&Array.isArray(q[1]);
+let L;
+
+function tab(i){document.body.classList.remove('les');document.querySelectorAll('.nav button').forEach((b,k)=>b.className=k==i?'on':'')}
+const SYM=['⚗️','🧬'];
+const av=(c)=>`<span class="av ${c||''}" style="background:${S.avc||'#ddf4ff'}">${S.av||'🧑‍🔬'}</span>`;
+function hdr(){return `<div class="top"><span onclick="prof()">${av()}</span><span onclick="sw()">${SYM[S.sec]} ${score(S.sec)}</span><span class="fl ${S.last===T(0)?'on':''}" onclick="strk()">🔥 ${S.streak}</span><span onclick="shop()">💎 ${S.gem}</span></div>`}
+function sw(){
+ $('#pp').innerHTML=`<div class="ov" style="align-items:flex-start" onclick="cl()"><div class="sheet" style="border-radius:0 0 24px 24px;padding-top:calc(76px + env(safe-area-inset-top))" onclick="event.stopPropagation()"><b style="font-size:18px">Выбери курс</b><div style="display:flex;gap:12px;margin-top:12px">${SEC.map((n,i)=>`<button class="opt ${i==S.sec?'sel':''}" style="text-align:center" onclick="S.sec=${i};save();cl();home()"><div style="font-size:44px">${SYM[i]}</div>${n}<div style="font-size:13px;opacity:.7">Оценка: ${score(i)}</div></button>`).join('')}</div></div></div>`;
+}
+function cl(){$('#pp').innerHTML=''}
+// ===== Главная: модули → разделы → уроки + экзамен раздела
+function home(){
+ tab(0);S.chs=S.chs||{};
+ const ids=[];U.forEach((u,i)=>{if(u.s==S.sec)for(let j=0;j<4;j++)ids.push(i+'-'+j)});
+ const cur=ids.find(id=>!S.done[id]);
+ let h=hdr()+'<div id="sb" class="ban sb" style="display:none"></div>';
+ if(note){h+=`<div class="warn">${note}</div>`;note=''}
+ if(S.streak>0&&S.last!==T(0))h+='<div class="warn">🔥 Ударный режим под угрозой! Пройди урок сегодня, иначе она сбросится.</div>';
+ const off=[0,-46,0,46];
+ ids.forEach((id,k)=>{
+  const [ui,j]=id.split('-').map(Number),u=U[ui],done=S.done[id],gd=S.gold[id],lock=j<3&&k>0&&!S.done[ids[k-1]]&&!S.jmp[ui];
+  if(j==0){
+   const mn=U.slice(0,ui+1).filter(x=>x.s==u.s&&x.M).length;
+   if(u.M)h+=`<div class="mod">Модуль ${mn} · ${u.M}</div>`;
+   h+=`<div class="ban" data-t="1" style="background:${u.c};box-shadow:0 4px 0 ${u.d}"><small>МОДУЛЬ ${mn}, РАЗДЕЛ ${U.slice(0,ui).filter(x=>x.s==u.s).length+1}</small><h2>${u.n}</h2></div>`;
+  }
+  const bg=gd?'#ffc800':u.c,sd=gd?'#e5a800':u.d;
+  if(j==3){const k='p'+ui,d3=S.done[ui+'-2'],c2=S.chs[k];h+=`<button class="nd" style="background:none;box-shadow:none;left:-40px;${d3?'':'filter:grayscale(1);opacity:.55'}" onclick="${d3&&!c2?`ch('${k}')`:`pc(${ui})`}">${d3&&!c2?'<span class="go">ОТКРЫТЬ</span>':''}${chest(0,c2,64)}</button>`}
+  h+=`<button data-id="${id}" class="nd ${lock?'lk':''} ${id===cur?'cur':''}" style="--rc:${u.c};background:${bg};box-shadow:0 6px 0 ${sd};left:${off[j]}px" onclick="${lock?`lt(${ui})`:done?`pop('${id}')`:j==3?`ex(${ui})`:`start('${id}')`}">${id===cur?'<span class="go">'+(j==3?'ЭКЗАМЕН':'НАЧАТЬ')+'</span>':''}${lock?'🔒':gd?'👑':j==3?'🎓':done?'★':'⭐'}</button>`;
+ });
+ if(!cur)h+='<div class="card" style="text-align:center">🎉 Все разделы пройдены! Проходи уроки на золотой уровень 👑</div>';
+ $('#app').innerHTML=h;const tn=document.querySelector(`[data-id="${S.ln}"]`)||$('.cur');tn?tn.scrollIntoView({block:'center'}):scrollTo(0,0);document.documentElement.style.setProperty('--th',$('.top').offsetHeight+'px');setTimeout(sbUpd,60);
+}
+function lt(){
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">🔒 Урок пока закрыт</b><div style="color:var(--mut);margin:8px 0">Проходи уроки по порядку. Или сдай экзамен 🎓 в конце раздела: он всегда открыт и может открыть раздел целиком.</div><button class="btn gh" onclick="cl()">Закрыть</button></div></div>`;
+}
+function ex(ui){
+ if([0,1,2].every(j=>S.done[ui+'-'+j]))return start(ui+'-3');
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">🎓 Экзамен раздела «${U[ui].n}»</b><div style="color:var(--mut);margin:8px 0">Можно сдать сразу, не проходя уроки: до 10 вопросов, не больше 2 ошибок. Если сдашь, раздел откроется полностью, а все прошлые разделы засчитаются пройденными.</div><button class="btn" onclick="jump(${ui})">🚀 Испытать себя</button><button class="btn gh" onclick="cl()">Закрыть</button></div></div>`;
+}
+function jump(ui){
+ cl();S.ln=ui+'-3';const t=U[ui].s,own=U[ui].q.map((q,i)=>({q,k:ui+'.'+i}));
+ const old=U.flatMap((u,i)=>u.s==t&&i<ui&&!S.done[i+'-3']?u.q.map((q,n)=>({q,k:i+'.'+n})):[]);
+ begin('jmp-'+ui,sh([...sh(own).slice(0,old.length?6:8),...sh(old).slice(0,4)]),{ex:1,jmp:ui});
+}
+function pc(ui){
+ const n=[0,1,2].filter(j=>!S.done[ui+'-'+j]).length;
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">${n?`Пройди ещё ${n} ${n==1?'урок':'урока'}, чтобы открыть этот сундук!`:'Сундук уже открыт 🎉'}</b><button class="btn gh" onclick="cl()">Закрыть</button></div></div>`;
+}
+function pop(id){
+ const j=+id.split('-')[1];
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">${j==3?'Экзамен раздела':'Урок '+(j+1)} пройден ✓</b><button class="btn" onclick="start('${id}')">Повторить</button>${j<3?`<button class="btn gld" onclick="start('${id}',1)">👑 Золотой уровень · +25 XP ${S.gold[id]?'✓':''}</button><div style="color:var(--mut);font-size:13px">Золото: 8 заданий, больше ввода и сборки, 2 жизни, ошибки не повторяются.</div>`:''}<button class="btn gh" onclick="cl()">Отмена</button></div></div>`;
+}
+// ===== Урок: 1–2 урока — новый материал, 3-й — тест по теме; в уроки подмешиваются вопросы из прошлых тем
+const ty=q=>q[0]=='m'?'m':q[0]=='b'?'b':Array.isArray(q[1])?'c':'i';
+function start(id,g){
+ cl();S.ln=id;save();
+ const [ui,j]=id.split('-').map(Number),pool=U[ui].q.map((q,i)=>({q,k:ui+'.'+i}));
+ let qs,o={};
+ const ls=pool.length>=16?4:3;
+ if(j==3){qs=[...pool.slice(ls*3),...sh(pool.slice(0,ls*3)).slice(0,2)];o={ex:1}}
+ else if(g){qs=sh(pool).sort((a,b)=>(ty(a.q)=='c')-(ty(b.q)=='c')).slice(0,8);o={g:1}}
+ else qs=pool.slice(j*ls,j*ls+ls);
+ begin(id,sh(qs),o);
+}
+function snd(t){
+ if(S.mute)return;
+ try{ac=window.ac=window.ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state=='suspended')ac.resume();
+ const q={ok:[[660,0,.12],[880,.1,.2]],no:[[220,0,.2],[150,.16,.28]],tap:[[520,0,.05]],win:[[523,0,.15],[659,.15,.15],[784,.3,.15],[1047,.45,.45]],chest:[[300,0,.1],[400,.1,.1],[500,.2,.1],[700,.3,.1],[1000,.4,.3]],coin:[[988,0,.08],[1319,.08,.35]]}[t];
+ q.forEach(([f,d,l])=>{const o=ac.createOscillator(),g=ac.createGain(),a=ac.currentTime+d;o.type=t=='no'?'sawtooth':'sine';o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(.0001,a);g.gain.exponentialRampToValueAtTime(.2,a+.02);g.gain.exponentialRampToValueAtTime(.0001,a+l);o.start(a);o.stop(a+l+.05)})}catch(e){}
+}
+function begin(id,qs,o){o=o||{};L={id,qs,i:0,h:o.ex?3:o.g?2:99,n:qs.length,err:0,g:o.g,ex:o.ex,jmp:o.jmp};show()}
+// работа над ошибками: вопросы, на которых ошибся, возвращаются, пока не ответишь верно
+function practice(){
+ const qs=sh(S.mis||[]).slice(0,6).map(k=>{const [u,n]=k.split('.');return {q:U[u].q[n],k,r:1}});
+ if(qs.length)begin('mis',qs);
+}
+function bad(k){if(!k)return;S.mis=S.mis||[];if(!S.mis.includes(k))S.mis.push(k);save()}
+function show(){
+ if(L.i>=L.qs.length)return fin();
+ document.body.classList.add('les');
+ const x=L.qs[L.i],q=x.q,t=ty(q);L.sel=null;L.ck=0;let b;const fixl=(x.fix||L.id=='mis')?'<div style="color:#ff9600;margin-top:14px">🔁 ИСПРАВЛЯЕМ ОШИБКИ</div>':'';
+ if(t=='m'){
+  L.m={l:sh(q[1].map((p,i)=>[p[0],i])),r:sh(q[1].map((p,i)=>[p[1],i])),a:null,d:[],n:q[1].length,w:0};
+  b='<div class="q">Соедини пары</div><div class="cols" id="mm"></div>';
+ }else{
+  b=`<div class="q">${t=='b'?q[1]:q[0]}</div>`;
+  if(t=='c'){L.o=sh(q[1].map((t,i)=>({t,ok:i==q[2]})));b+=L.o.map((o,k)=>`<button class="opt" onclick="pick(${k})">${o.t}</button>`).join('')}
+  else if(t=='b'){L.b={p:sh([...q[2],...q[3]]).map((s,i)=>({s,i})),a:[]};b+='<div class="ans" id="ba"></div><div id="bp"></div>'}
+  else b+=`<input class="in" id="in" autocomplete="off" autocapitalize="off" placeholder="Введи ответ" oninput="$('#ck').disabled=!this.value.trim()" onkeydown="if(event.key=='Enter')check()">`;
+ }
+ $('#app').innerHTML=`<div class="lh"><button class="x" onclick="qx()">✕</button><div class="bar"><i style="width:${L.i/L.qs.length*100}%"></i></div><span>${L.ex||L.g?(L.ex?'🎓 ':'👑 ')+'❤️ '+L.h:''}</span></div>${fixl}${b}<div id="ft"><button class="btn" id="ck" disabled onclick="check()">Проверить</button></div>`;
+ if(t=='m')rm();else if(t=='b')rb();else if(t=='i')setTimeout(()=>$('#in').focus(),50);
+}
+// собери из «кирпичиков»: формулы и последовательности
+function rb(){
+ const B=L.b,c=(o,f)=>`<button class="chip ${f&&B.a.includes(o)?'dn':''}" onclick="${f?'bt':'bu'}(${o.i})">${o.s}</button>`;
+ $('#ba').innerHTML=B.a.map(o=>c(o,0)).join('');
+ $('#bp').innerHTML=B.p.map(o=>c(o,1)).join('');
+ $('#ck').disabled=!B.a.length;
+}
+function bt(i){if(L.ck)return;snd('tap');const o=L.b.p.find(o=>o.i==i);if(!L.b.a.includes(o))L.b.a.push(o);rb()}
+function bu(i){if(L.ck)return;snd('tap');L.b.a=L.b.a.filter(o=>o.i!=i);rb()}
+function rm(){
+ const m=L.m,c=(a,t)=>a.map(([s,i])=>`<button class="opt ${m.d.includes(i)?'dn':''} ${t=='l'&&m.a===i?'sel':''}" onclick="m${t}(${i})">${s}</button>`).join('');
+ $('#mm').innerHTML=`<div>${c(m.l,'l')}</div><div>${c(m.r,'r')}</div>`;
+}
+function ml(i){snd('tap');L.m.a=i;rm()}
+function mr(i){
+ const m=L.m;if(m.a===null)return;
+ if(m.a===i){if(m.d.length+1<m.n)snd('ok');m.d.push(i);m.a=null;rm();if(m.d.length==m.n)res(true,'',m.w)}
+ else{snd('no');m.w=1;bad(L.qs[L.i].k);m.a=null;rm();const e=$('#mm');e.classList.add('shk');setTimeout(()=>e.classList.remove('shk'),400)}
+}
+function pick(k){
+ if(L.ck)return;snd('tap');L.sel=k;
+ document.querySelectorAll('.opt').forEach((e,i)=>e.classList.toggle('sel',i==k));
+ $('#ck').disabled=false;
+}
+function check(){
+ if(L.ck)return;const q=L.qs[L.i].q,t=ty(q);
+ if(t=='c')return res(L.o[L.sel].ok,q[1][q[2]]);
+ if(t=='b')return res(L.b.a.map(o=>o.s).join('|')==q[2].join('|'),q[2].join(q[4]));
+ const v=$('#in').value.trim().toLowerCase(),A=q[1].split('|');
+ res(A.some(a=>a.toLowerCase()==v),A[0]);
+}
+function res(ok,ans,keep){
+ L.ck=1;snd(ok?'ok':'no');L.run=ok?(L.run||0)+1:0;if(!ok&&!(S.off||{}).vib&&navigator.vibrate)navigator.vibrate(150);const it=L.qs[L.i],q0=it.q,e=q0[0]=='m'?q0[2]:q0[0]=='b'?q0[5]:Array.isArray(q0[1])?q0[3]:q0[2];
+ if(!ok){L.h--;L.err++;if(!L.g&&!L.ex)L.qs.push({...it,fix:1});bad(it.k)} // ошибка — вопрос вернётся в конец урока и в «Работу над ошибками»
+ else{Q().ok++;if(L.id=='mis'&&it.k&&!keep){S.fx=(S.fx||0)+1;S.mis=(S.mis||[]).filter(x=>x!=it.k);save()}}
+ if(ty(it.q)=='c')document.querySelectorAll('.opt')[L.sel].classList.replace('sel',ok?'ok':'no');
+ const f=$('#ft');f.className=ok?'g':'r';
+ f.innerHTML=`<div style="max-width:488px;margin:auto"><b style="font-size:22px">${ok?'✅ Верно!':'❌ Неверно'}</b><div style="margin:6px 0 ${e?6:14}px">${ok?'':'Правильный ответ: '+ans}</div>${e?`<div style="font-size:15px;margin:0 0 14px;color:var(--tx)">💡 ${e}</div>`:''}${ok&&L.run>=3&&!(S.off||{}).hnt?`<div style="font-size:15px;margin:0 0 14px">🔥 Так держать! ${L.run} верных подряд</div>`:''}<button class="btn ${ok?'':'red'}" onclick="nx()">Продолжить</button></div>`;
+}
+function nx(){if(L.h<=0)return fail();L.i++;show()}
+function fail(){
+ $('#app').innerHTML=`<div class="ctr"><div class="big">💔</div><h1>${L.jmp!==undefined?'Испытание не пройдено':L.ex?'Экзамен не сдан':'Жизни закончились'}</h1><p>${L.ex?'Допустимо не больше 2 ошибок. Повтори раздел и приходи снова.':'Не страшно — повтори тему и попробуй ещё раз.'}</p></div><div id="ft"><button class="btn" onclick="${L.id=='mis'?'practice()':L.id=='mix'?'mix()':L.jmp!==undefined?`jump(${L.jmp})`:`start('${L.id}',${L.g?1:0})`}">Попробовать снова</button><button class="btn gh" onclick="home()">Выйти</button></div>`;
+}
+function fin(){
+ snd('win');const mis=L.id=='mis'||L.id=='mix',xp=((L.id=='mix'?10:mis?5:L.ex?30:L.g?25:10)+(L.err==0?5:0))*(Date.now()<(S.bx||0)?2:1),gm=mis?0:L.ex?20:L.g?10:5;let inc=false;
+ S.xp+=xp;S.wxp=(S.wxp||0)+xp;S.gem+=gm;S.hist[T(0)]=(S.hist[T(0)]||0)+xp;
+ if(L.jmp!==undefined){U.forEach((u,i)=>{if(u.s==U[L.jmp].s&&i<=L.jmp)for(let j=0;j<4;j++)S.done[i+'-'+j]=1})}
+ else if(!mis){if(L.g)S.gold[L.id]=1;else S.done[L.id]=1}
+ const q=Q();q.xp+=xp;q.les++;
+ if(S.last!==T(0)){S.streak=S.last===T(1)?S.streak+1:1;S.last=T(0);inc=true}
+ S.best=Math.max(S.best||0,S.streak);save();sync();
+ const acc=Math.round(100*L.n/(L.n+L.err));
+ $('#app').innerHTML=`<div class="ctr"><div class="big">${inc?'🔥':L.ex?'🎓':L.g?'👑':'🏆'}</div><h1>${inc?S.streak+' '+dn(S.streak)+' в ударном режиме!':L.jmp!==undefined?'Испытание пройдено!':L.ex?'Экзамен сдан!':L.g?'Золотой уровень!':'Урок пройден!'}</h1><p>${L.jmp!==undefined?'🚀 Раздел и все предыдущие открыты!':L.ex?'🎓 Следующий раздел открыт!':inc?'Занимайся каждый день, чтобы ударный режим рос.':''}</p><div class="st"><div>+${xp}<small>XP</small></div><div>+${gm}💎<small>АЛМАЗЫ</small></div><div>${acc}%<small>ТОЧНОСТЬ</small></div></div></div><div id="ft"><button class="btn" onclick="home()">Продолжить</button></div>`;
+}
+const dn=n=>n%10==1&&n%100!=11?'день':[2,3,4].includes(n%10)&&![12,13,14].includes(n%100)?'дня':'дней';
+
+// ===== Профиль: серия, неделя, статистика
+const EM=['🧑‍🔬','👩‍🔬','🦊','🐼','🐙','🦉','🐸','🤖'],BG=['#ddf4ff','#ffe0e0','#e6ffd0','#f0dcff','#fff3c4'];
+const MD=[3,7,14,30,100];
+const AC=[['🔥','Ударник','Достигни ударного режима в {n} дн.',[3,7,14,30,100],()=>S.best||0],['⭐','Опытный','Набери {n} XP',[100,500,1000,3000,10000],()=>S.xp],['📘','Ученик','Пройди {n} уроков',[1,5,15,30,60],()=>Object.keys(S.done).length],['🔧','Техник','Исправь {n} ошибок',[5,15,50,100,250],()=>S.fx||0],['👑','Золотой','Пройди {n} уровней на золото',[1,3,8,15],()=>Object.keys(S.gold).length],['🎓','Отличник','Сдай {n} экзаменов',[1,3,6,10],()=>Object.keys(S.done).filter(k=>k.endsWith('-3')).length]];
+const lvl=a=>a[3].filter(t=>a[4]()>=t).length;
+const bar=(t,l,r)=>`<div class="lh" style="justify-content:space-between"><b style="min-width:70px;font-size:22px;color:var(--mut)" onclick="${l[1]}">${l[0]}</b><b style="font-size:18px;color:var(--mut)">${t}</b><b style="min-width:70px;text-align:right;color:var(--b)" onclick="${r[1]}">${r[0]}</b></div>`;
+function prof(){
+ tab(9);const b=S.best||0;S.ac=S.ac||{};
+ $('#app').innerHTML=bar(S.name||'Химик',['✕','home()'],['⚙️','sett()'])+`<div style="text-align:center;margin-top:8px">${av('big')}<h2 style="margin:10px 0 0" onclick="ren()">${S.name||'Химик'} ✏️</h2><div style="color:var(--mut);font-size:13px">В ХИМБИО С ${S.since}</div></div>
+ <div class="mod">Персонаж</div><div style="margin-top:14px">${EM.concat(S.own||[]).map(e=>`<button class="chip" onclick="S.av='${e}';save();prof()">${e}</button>`).join('')}</div><div>${BG.map(c=>`<button class="dot" style="background:${c}" onclick="S.avc='${c}';save();prof()"></button>`).join('')}</div>
+ <div class="mod">Друзья</div><div style="margin-top:14px"><span style="color:var(--mut)">${S.tok?'Ты вошёл как @'+S.un:'Войди в аккаунт, чтобы добавлять друзей по @юзернейму'}</span></div><button class="btn" style="margin-top:12px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="frs()">👥 Друзья и аккаунт</button>
+ <div class="mod">Обзор</div><div class="st" style="margin-top:14px"><div>🔥 ${S.streak}<small>УДАРНЫЙ РЕЖИМ</small></div><div>${b}<small>РЕКОРД</small></div><div>${S.xp}<small>XP</small></div></div><div class="st" style="margin-top:0"><div>${score(0)}<small>ХИМИЯ</small></div><div>${score(1)}<small>БИОЛОГИЯ</small></div><div>${Object.keys(S.done).length}<small>УРОКОВ</small></div></div>
+ <div class="mod">Медали</div><div style="margin-top:14px">${MD.map(n=>`<span class="bd ${b>=n?'':'lk'}"><i>🔥</i>${n} дн.</span>`).join('')}</div>
+ <div class="mod">Достижения</div><div style="margin-top:14px">${AC.map((a,i)=>{const L=lvl(a);return `<span class="bd ${L?'':'lk'}" onclick="ach(${i})"><i>${a[0]}</i>${a[1]}<br>ур. ${L}${L>(S.ac[i]||0)?' 🎁':''}</span>`}).join('')}</div>`;
+}
+function ach(i){
+ const a=AC[i],v=a[4](),L=lvl(a),c=(S.ac||{})[i]||0,nx=a[3][L];let rw=0;for(let k=c+1;k<=L;k++)rw+=10*k;
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" style="text-align:center" onclick="event.stopPropagation()"><div style="font-size:70px">${a[0]}</div><h2 style="margin:4px 0">${a[1]} · уровень ${L}</h2><div style="color:var(--mut)">${a[2].replace('{n}',nx||a[3][a[3].length-1])}</div>${nx?`<div class="pb"><i style="width:${Math.min(100,v/nx*100)}%"></i></div><small style="color:var(--mut)">${v} / ${nx} · награда за уровень ${L+1}: 💎 ${10*(L+1)}</small>`:'<div style="margin:8px 0">🏆 Максимальный уровень!</div>'}${rw?`<button class="btn gld" style="margin-top:12px" onclick="claim(${i})">Получить награду 💎 ${rw}</button>`:''}<button class="btn gh" onclick="cl()">Закрыть</button></div></div>`;
+}
+function claim(i){
+ const a=AC[i],L=lvl(a),c=(S.ac=S.ac||{})[i]||0;let g=0;for(let k=c+1;k<=L;k++)g+=10*k;
+ S.gem+=g;S.ac[i]=L;save();snd('coin');cl();prof();
+}
+function ren(){ask('Как тебя зовут?',S.name||'',n=>{if(n){S.name=n.slice(0,16);save();prof()}})}
+function addFr(){
+ ask('Имя друга','',n=>{if(n){S.fr=(S.fr||[]).concat(n.slice(0,16));save();prof();if(navigator.share)navigator.share({title:'ХимБио',text:'Занимайся химией и биологией со мной в ХимБио!',url:location.href}).catch(()=>{})}});
+}
+// экран «Ударный режим»: календарь, заморозки, напоминания
+function strk(){
+ tab(9);const d=new Date(),y=d.getFullYear(),m=d.getMonth(),p=n=>String(n).padStart(2,'0'),f=(new Date(y,m,1).getDay()+6)%7,N=new Date(y,m+1,0).getDate();
+ let c=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<span>${x}</span>`).join('')+'<span></span>'.repeat(f);
+ for(let i=1;i<=N;i++){const k=`${y}-${p(m+1)}-${p(i)}`;c+=`<b class="${S.hist[k]?'on':''} ${k===T(0)?'td':''}">${i}</b>`}
+ $('#app').innerHTML=`<div class="lh"><button class="x" onclick="home()">✕</button><b style="flex:1;text-align:center;font-size:18px">Ударный режим</b></div>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0"><div><div style="font-size:72px;line-height:1;color:${S.streak?'#ff9600':'var(--mut)'}">${S.streak}</div><div style="font-size:20px;color:var(--mut)">${dn(S.streak)} в ударе!</div></div><div style="font-size:90px">🔥</div></div>
+ <div class="card">❄️ Заморозок: ${S.fz}/2<div style="color:var(--mut);font-size:14px;margin:4px 0 10px">Спасает ударный режим, если пропустишь день</div><button class="btn" onclick="buyFz()">Получить больше · 50 💎</button></div>
+ <div class="mod" style="margin-top:22px">Календарь</div><div class="card"><div style="text-align:center;margin-bottom:10px">${d.toLocaleDateString('ru',{month:'long',year:'numeric'})}</div><div class="cal">${c}</div></div>
+ <div class="mod" style="margin-top:22px">Напоминания</div><div class="card">Время тренировки <input type="time" id="rt" class="in" style="width:auto;margin-left:8px" value="${S.rt||'19:00'}" onchange="S.rt=this.value;save()"><button class="btn" style="margin-top:12px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="addCal()">📅 Добавить в календарь Android</button><button class="btn ${S.notif?'red':''}" style="margin-top:12px" onclick="togNotif()">${S.notif?'🔕 Выключить уведомления':'🔔 Включить уведомления'}</button><div style="color:var(--mut);font-size:13px;margin-top:8px">Уведомления приходят, пока приложение открыто или работает в фоне. Для надёжных ежедневных напоминаний используй календарь.</div></div>`;
+}
+function addCal(){
+ const t=($('#rt').value||'19:00').split(':'),p=n=>String(n).padStart(2,'0'),d=new Date(),e=+t[0]*60+ +t[1]+15;
+ S.rt=t.join(':');save();
+ const ds=d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
+ const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//HimBio//RU','BEGIN:VEVENT','UID:himbio-daily@local','DTSTAMP:'+ds+'T000000Z','DTSTART:'+ds+'T'+t[0]+t[1]+'00','DTEND:'+ds+'T'+p(Math.floor(e/60)%24)+p(e%60)+'00','RRULE:FREQ=DAILY','SUMMARY:🔥 ХимБио: время тренировки','DESCRIPTION:Пройди урок и сохрани ударный режим!','BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:Пора заниматься','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.download='himbio.ics';document.body.appendChild(a);a.click();a.remove();
+ alert('Открой скачанный файл himbio.ics, чтобы добавить ежедневное напоминание в календарь.');
+}
+function togNotif(){
+ if(S.notif){S.notif=0;save();return strk()}
+ if(!window.Notification)return alert('Уведомления не поддерживаются в этом браузере');
+ Notification.requestPermission().then(r=>{if(r=='granted'){S.notif=1;S.rt=$('#rt').value||S.rt;save()}else alert('Разрешение на уведомления не выдано');strk()});
+}
+function chk(){
+ if(!S.notif||!window.Notification||Notification.permission!='granted'||S.last===T(0)||S.nl===T(0))return;
+ const n=new Date(),r=(S.rt||'19:00').split(':');
+ if(n.getHours()*60+n.getMinutes()>=+r[0]*60+ +r[1]){S.nl=T(0);save();try{new Notification('🔥 Ударный режим',{body:'Пройди урок сегодня, чтобы не потерять ударный режим!'})}catch(e){}}
+}
+function buyFz(){if(S.fz>=2)return alert('Максимум 2 заморозки');if(S.gem<50)return alert('Не хватает алмазов');S.gem-=50;S.fz++;save();strk()}
+function inst(){if(window.dp)dp.prompt();else alert('Открой меню браузера → «Добавить на главный экран».')}
+function chest(t,o,w){const [c,d]=CH[t];return `<svg viewBox="0 0 120 100" width="${w||70}"><rect x="15" y="45" width="90" height="48" rx="8" fill="${c}" stroke="${d}" stroke-width="5"/>${o?'<ellipse cx="60" cy="47" rx="38" ry="9" fill="#fff6a8"/>':''}<g class="lid ${o?'op':''}"><path d="M15 45Q15 15 60 15Q105 15 105 45Z" fill="${c}" stroke="${d}" stroke-width="5"/></g><rect x="50" y="40" width="20" height="20" rx="4" fill="#fff" stroke="${d}" stroke-width="4"/></svg>`}
+// задание дня → сундук: 3 тапа, каждый может улучшить сундук
+const qi=()=>((new Date(T(0))/864e5)|0)%3;
+let C;
+function quests(){
+ tab(1);const q=Q(),d=QS[qi()],v=Math.min(q[d[1]],d[2]),ok=v>=d[2];
+ $('#app').innerHTML=hdr()+`<div class="qb"><h2>Задания</h2>Выполни задание дня и получи сундук!</div><div class="mod" style="margin-top:24px">Задание дня</div><div class="card qc"><div style="flex:1"><div style="font-size:18px">${d[0]}</div><div class="pb"><i style="width:${v/d[2]*100}%;background:var(--g)"></i></div><small style="color:var(--mut)">${v} / ${d[2]}</small></div><div class="cb" onclick="${ok&&!q.c?'ch()':''}">${chest(0,q.c)}${ok&&!q.c?'<span class="rd">ОТКРЫТЬ</span>':''}</div></div><p style="color:var(--mut);text-align:center">Новое задание каждый день. У сундука 3 попытки улучшить награду.</p>`;
+}
+function ch(k){C={k,t:0,left:3,done:0,msg:'Тапай по сундуку: он может стать лучше!'};cr()}
+function cr(){
+ $('#pp').innerHTML=`<div class="ov" style="align-items:center"><div class="ctr2"><div id="cs" class="${C.up?'pop':'shake'}" style="display:inline-block" onclick="op()">${chest(C.t,0,170)}</div><div id="cr" style="min-height:90px;font-size:20px;margin:10px 0">${C.msg}<div style="color:var(--mut);font-size:15px">${C.left?'Попыток: '+C.left:''}</div></div><button class="btn" id="cb2" style="display:none" onclick="cl();C.k?home():quests()">Забрать</button></div></div>`;
+}
+function op(){
+ if(C.done||!C.left)return;
+ C.left--;C.up=C.t<2&&Math.random()<.5;
+ if(C.up){C.t++;snd('coin')}else snd('tap');
+ C.msg=C.up?'⬆️ Сундук улучшен: '+CH[C.t][2]+'!':'Пока без улучшения…';
+ cr();
+ if(!C.left)setTimeout(()=>{
+  C.done=1;const R=[[10,20,.15],[25,40,.3],[50,80,.6]][C.t];let t;
+  if(Math.random()<R[2]&&S.fz<2){S.fz++;t='❄️ Заморозка!'}else{const g=R[0]+(Math.random()*(R[1]-R[0]+1)|0);S.gem+=g;t='💎 +'+g}
+  if(C.k)S.chs[C.k]=1;else Q().c=1;save();snd('chest');const c=$('#cs');c.className='glow';c.querySelector('.lid').classList.add('op');
+  setTimeout(()=>{snd('coin');$('#cr').innerHTML=`${CH[C.t][2]} сундук<br><span class="pop">${t}</span>`;$('#cb2').style.display='block'},550);
+ },700);
+}
+// оценка знаний
+function score(s){let p=0;U.forEach((u,i)=>{if(u.s==s)for(let j=0;j<4;j++){const id=i+'-'+j;if(S.done[id])p+=j==3?5:2;if(S.gold[id])p+=2}});return p}
+function assess(){
+ tab(5);
+ $('#app').innerHTML=hdr()+SEC.map((n,s)=>{
+  const LV=lv(s),p=score(s),nx=LV.find(l=>p<l[0]),pv=[...LV].reverse().find(l=>p>=l[0]);
+  return `<div class="card"><div style="color:var(--mut);font-size:14px">ОЦЕНКА · ${n.toUpperCase()}</div><div style="font-size:56px">${p}</div><div>${pv?pv[1]:'Новичок'}</div>${nx?`<div class="pb"><i style="width:${p/nx[0]*100}%"></i></div><small style="color:var(--mut)">До «${nx[1]}»: ${nx[0]-p}</small>`:'<small>Максимальный уровень 🎉</small>'}<div style="margin-top:12px">${LV.map(l=>`<div style="opacity:${p>=l[0]?1:.4}">${p>=l[0]?'✅':'⚪'} ${l[0]} — ${l[1]}</div>`).join('')}</div></div>`}).join('')+'<p style="color:var(--mut);text-align:center">Урок +2 · золотой уровень +2 · экзамен раздела +5</p>';
+}
+function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
+window.alert=toast;
+let AQ;
+function ask(t,v,cb){AQ=cb;$('#pp').innerHTML=`<div class="ov" style="align-items:center"><div class="ctr2" style="text-align:left"><b style="font-size:18px">${t}</b><input id="ai" class="in" style="margin:12px 0" value="${(v||'').replace(/"/g,'&quot;')}"><button class="btn" onclick="const v=$('#ai').value.trim();cl();AQ(v)">OK</button><button class="btn gh" onclick="cl()">Отмена</button></div></div>`;setTimeout(()=>$('#ai').focus(),60)}
+function yn(t,d,l,js){$('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">${t}</b><div style="color:var(--mut);margin:8px 0">${d}</div><button class="btn" onclick="cl()">Остаться</button><button class="btn gh" style="color:var(--r)" onclick="cl();${js}">${l}</button></div></div>`}
+const qx=()=>yn('Выйти из урока?','Прогресс этого урока не сохранится.','Выйти','home()');
+function resetAll(){S={xp:0,streak:0,best:0,last:'',done:{},hist:{},sec:0,gem:0,fz:0,gold:{},jmp:{},since:T(0)};save();location.reload()}
+// плашка текущего модуля и раздела: меняется при прокрутке
+function sbUpd(){
+ const sb=$('#sb');if(!sb)return;const th=$('.top').offsetHeight;let c=null;
+ document.querySelectorAll('.ban[data-t]').forEach(b=>{if(b.getBoundingClientRect().top<=th+6)c=b});
+ if(c){sb.style.background=c.style.background;sb.style.boxShadow=c.style.boxShadow;sb.innerHTML=c.innerHTML;sb.style.display='block'}else sb.style.display='none';
+}
+addEventListener('scroll',sbUpd,{passive:true});
+// ===== Аккаунт, друзья, онлайн-лиги (сервер на Val Town)
+const API='https://eldarjzj--9f5321fcd84b11f1a5351607ee4eb77e.web.val.run';
+async function api(p,b){
+ let r;try{r=await fetch(API+p,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(b||{})})}catch(e){throw new Error('Нет связи с сервером. Проверь интернет или VPN')}
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.e||'Ошибка сервера ('+r.status+')');return j;
+}
+async function ping(){try{const r=await fetch(API+'/ping');toast(r.ok?'Сервер доступен ✅':'Сервер ответил: '+r.status)}catch(e){toast('Нет связи с сервером ❌')}}
+let st;function sync(){if(!S.tok)return;clearTimeout(st);st=setTimeout(syncNow,3000)}
+async function syncNow(){
+ if(!S.tok)return;const b={...S};delete b.tok;
+ try{await api('/sync',{t:S.tok,d:{xp:S.xp,streak:S.streak,best:S.best||0,wxp:S.wxp||0,wk:S.wk,lg:S.lg||0,av:S.av||'🧑‍🔬',avc:S.avc||'#ddf4ff',name:S.name||S.un},b:JSON.stringify(b)})}catch(e){}
+}
+let AM='in';
+function un(el){if(AM=='up'){const v=el.value.replace(/@/g,'').toLowerCase();el.value=v?'@'+v:''}}
+function acc(){
+ tab(9);const B=bar('Аккаунт',['←','sett()'],['','']);
+ $('#app').innerHTML=B+(S.tok?`<div class="card" style="text-align:center">${av('big')}<h2>@${S.un}</h2><button class="btn" onclick="syncNow().then(()=>toast('Синхронизировано'))">🔄 Синхронизировать</button><button class="btn" style="margin-top:10px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="pull()">⬇️ Загрузить прогресс с сервера</button><button class="btn gh" style="color:var(--r)" onclick="S.tok='';S.un='';save();acc()">Выйти</button></div><div class="card" onclick="frs()">👥 Друзья</div>`:`<div class="tabs"><button class="${AM=='in'?'on':''}" onclick="AM='in';acc()">Вход</button><button class="${AM=='up'?'on':''}" onclick="AM='up';acc()">Регистрация</button></div><div class="card">${AM=='up'?'<input id="ae" class="in" type="email" placeholder="Почта" autocapitalize="off">':''}<input id="an" class="in" style="margin-top:10px" placeholder="${AM=='up'?'@юзернейм':'@юзернейм или почта'}" autocapitalize="off" oninput="un(this)"><input id="ap" class="in" style="margin-top:10px" type="password" placeholder="Пароль (от 6 символов)"><button class="btn" style="margin-top:12px" onclick="auth()">${AM=='up'?'Создать аккаунт':'Войти'}</button><div style="color:var(--mut);font-size:13px;margin-top:10px">Юзернейм уникален: по нему друзья найдут тебя. Если он занят, придумай другой.</div><button class="btn gh" onclick="ping()">Проверить связь с сервером</button></div>`);
+}
+async function auth(){
+ const id=$('#an').value.trim().toLowerCase().replace(/^@/,''),p=$('#ap').value;
+ try{const r=AM=='up'?await api('/register',{u:id,e:$('#ae').value.trim().toLowerCase(),p}):await api('/login',{id,p});
+  S.tok=r.t;S.un=r.u;if(r.b){const o=JSON.parse(r.b);if((o.xp||0)>S.xp)S={...o,tok:S.tok,un:S.un}}
+  save();await syncNow();toast('Готово!');acc();
+ }catch(e){toast(e.message)}
+}
+async function pull(){
+ try{const r=await api('/pull',{t:S.tok});if(!r.b)return toast('На сервере пока нет данных');S={...JSON.parse(r.b),api:S.api,tok:S.tok,un:S.un};save();toast('Прогресс загружен');home()}catch(e){toast(e.message)}
+}
+async function frs(){
+ if(!S.tok){toast('Сначала войди в аккаунт (Настройки → Аккаунт)');return acc()}
+ tab(9);const B=bar('Друзья',['←','prof()'],['➕','addF()']);$('#app').innerHTML=B+'<div class="card">Загрузка…</div>';
+ try{await syncNow();const r=await api('/friends',{t:S.tok});
+  $('#app').innerHTML=B+(r.in.length?'<h3>Заявки</h3>'+r.in.map(x=>`<div class="card qc"><span style="flex:1">${x.av} ${x.name||x.u} <small style="color:var(--mut)">@${x.u}</small></span><button class="btn" style="width:auto;padding:8px 14px" onclick="acf('${x.u}')">Принять</button></div>`).join(''):'')+'<h3>Друзья</h3>'+(r.f.map(x=>`<div class="card qc"><span style="font-size:30px">${x.av}</span><span style="flex:1"><b>${x.name||x.u}</b><br><small style="color:var(--mut)">@${x.u}</small></span><span>🔥 ${x.streak} · ${x.xp} XP</span></div>`).join('')||'<div class="card" style="color:var(--mut)">Пока никого. Нажми ➕ и введи ник друга.</div>');
+ }catch(e){toast(e.message)}
+}
+function addF(){ask('Юзернейм друга (@…)','@',async u=>{u=u.replace(/^@/,'');if(!u)return;try{await api('/add',{t:S.tok,u});toast('Заявка отправлена');frs()}catch(e){toast(e.message)}})}
+async function acf(u){try{await api('/accept',{t:S.tok,u});frs()}catch(e){toast(e.message)}}
+async function lgNet(){
+ const h=hdr();$('#app').innerHTML=h+'<h2 style="margin:16px 0">Лига</h2><div class="card">Загрузка…</div>';
+ try{await syncNow();const r=await api('/league',{t:S.tok,lg:S.lg||0,wk:wk()}),i=r.l.findIndex(x=>x.me);S.lr=i<0?0:i+1;save();
+  $('#app').innerHTML=h+`<h2 style="margin:16px 0 0">${LG[S.lg||0]} лига ${LI[S.lg||0]}</h2><div style="color:var(--mut)">⏱ до конца недели: ${7-dw()} дн. · игроки онлайн</div>`+r.l.map((x,k)=>`<div class="card" style="display:flex;gap:12px;margin:6px 0;padding:10px 14px;${x.me?'border-color:var(--b);background:rgba(28,176,246,.1)':''}"><b style="width:26px;color:${k<10?'var(--g)':'var(--mut)'}">${k+1}</b><span style="flex:1">${x.av} ${x.name||x.u}</span><span>${x.wxp} XP</span></div>`).join('');
+ }catch(e){toast(e.message)}
+}
+setInterval(chk,30000);chk();
+// ===== Лиги (соперники — симуляция без сервера)
+const LG=['Бронзовая','Серебряная','Золотая','Сапфировая','Рубиновая','Изумрудная','Аметистовая','Жемчужная','Обсидиановая','Бриллиантовая'],LI=['🥉','🥈','🥇','🔷','♦️','💚','🔮','🦪','⚫','💎'];
+const NM=['Айдар','Мария','Олег','Света','Тимур','Лена','Даниил','Аня','Руслан','Катя','Игорь','Ника','Артём','Зарина','Макс','Юля','Фаиль','Вика','Эмиль','Оля','Павел','Дина','Стас','Рита','Ильяс','Полина','Глеб','Лиза','Камиль'];
+const wk=()=>Math.floor(new Date(T(0))/864e5/7),rd=x=>{x=Math.sin(x)*1e4;return x-Math.floor(x)},dw=()=>(new Date().getDay()+6)%7;
+function board(w,full){const f=full?1:(dw()+1)/7;return NM.map((n,i)=>({n,x:Math.floor(rd(w*50+i+1)*(150+(S.lg||0)*60)*f)})).concat([{n:S.name||'Ты',x:S.wxp||0,me:1}]).sort((a,b)=>b.x-a.x)}
+function league(){
+ tab(2);if(S.tok)return lgNet();const L0=S.lg||0;
+ $('#app').innerHTML=hdr()+`<h2 style="margin:16px 0 0">${LG[L0]} лига</h2><div style="color:var(--mut)">⏱ до конца недели: ${7-dw()} дн.</div><div style="margin:12px 0;text-align:center">${LI.map((x,i)=>i<L0-1||i>L0+2?'':`<span style="font-size:${i==L0?64:38}px;opacity:${i>L0?.35:1};margin:0 8px">${x}</span>`).join('')}</div>${S.wxp?'':'<div class="warn" style="background:rgba(28,176,246,.15);color:var(--b)">Пройди урок, чтобы войти в недельный рейтинг</div>'}<div style="color:var(--mut);font-size:13px">Топ-10 переходят в следующую лигу, последние 5 вылетают</div>`+board(wk()).map((x,i)=>`<div class="card" style="display:flex;gap:12px;margin:6px 0;padding:10px 14px;${x.me?'border-color:var(--b);background:rgba(28,176,246,.1)':''}"><b style="width:26px;color:${i<10?'var(--g)':i>=25?'var(--r)':'var(--mut)'}">${i+1}</b><span style="flex:1">${x.me?S.av||'🧑‍🔬':'👤'} ${x.n}</span><span>${x.x} XP</span></div>`).join('');
+}
+// ===== Лента новостей (случайные свежие события)
+function feed(){
+ tab(3);const dy=Math.floor(new Date(T(0))/864e5),SB=['химии','биологии'];
+ const it=[...Array(12)].map((_,i)=>{const r=rd(dy*20+i),n=NM[(dy*7+i*5)%NM.length],v=5+(r*60|0),t=(i+dy)%5,u=U[(r*U.length)|0];
+  return [['🏅',`достиг(ла) оценки ${v} по ${SB[(r*10|0)%2]}`],['📘',`прошёл(ла) раздел «${u.n}»`],['👑',`получил(а) золотой уровень в теме «${u.n}»`],['🎓',`сдал(а) экзамен раздела «${u.n}»`],['🔥',`держит ударный режим ${v} дн.`]][t].concat([n,i*2+1,'k'+dy+'-'+i,3+(r*20|0)])});
+ S.lk=S.lk||{};
+ $('#app').innerHTML=hdr()+'<h2 style="margin:16px 0">Лента новостей</h2>'+(S.streak?`<div class="card">${S.av||'🧑‍🔬'} <b>Ты</b> держишь ударный режим ${S.streak} дн. 🔥</div>`:'')+it.map(x=>`<div class="card"><div>${x[0]} <b>${x[2]}</b> <span style="color:var(--mut);font-size:13px">· ${x[3]} ч назад</span></div><div style="margin:6px 0">${x[1]}</div><button class="chip" style="font-size:15px;padding:6px 12px" onclick="S.lk['${x[4]}']=!S.lk['${x[4]}'];save();feed()">${S.lk[x[4]]?'❤️':'🤍'} ${x[5]+(S.lk[x[4]]?1:0)}</button></div>`).join('');
+}
+// ===== Магазин
+const AV2=['👨‍🚀','🧙','🦄','🐉','🥷','🧛'];
+function shop(){
+ tab(4);const bx=(S.bx||0)>Date.now()?` · активно ещё ${Math.ceil((S.bx-Date.now())/6e4)} мин`:'';
+ const row=(i,t,d,c,k)=>`<div class="card qc"><div style="font-size:42px">${i}</div><div style="flex:1"><b>${t}</b><div style="color:var(--mut);font-size:14px">${d}</div></div><button class="btn" style="width:auto;padding:10px 14px" onclick="buy('${k}',${c})">💎 ${c}</button></div>`;
+ $('#app').innerHTML=hdr()+'<h2 style="margin:16px 0">Магазин</h2><div class="mod">Ударный режим</div>'+row('❄️','Заморозка',`Спасает от пропуска дня. У тебя: ${S.fz}/2`,50,'fz')+'<div class="mod" style="margin-top:18px">Усиления</div>'+row('⚗️','Бонусный опыт ×2','Двойной XP на 15 минут'+bx,40,'bx')+'<div class="mod" style="margin-top:18px">Костюмы персонажа</div>'+AV2.map(a=>(S.own||[]).includes(a)?`<div class="card">${a} Куплено</div>`:row(a,'Новый аватар','Появится в профиле',60,a)).join('')+'<div class="mod" style="margin-top:18px">Промокод</div><div class="card" onclick="promo()">🎟 Активировать промокод</div>';
+}
+function buy(k,c){
+ if(S.gem<c)return alert('Не хватает алмазов 💎');
+ if(k=='fz'){if(S.fz>=2)return alert('Максимум 2 заморозки');S.fz++}
+ else if(k=='bx')S.bx=Math.max(Date.now(),S.bx||0)+9e5;
+ else{S.own=(S.own||[]).concat(k);S.av=k}
+ S.gem-=c;save();snd('coin');shop();
+}
+function promo(){
+ ask('Промокод','',c=>{c=c.toUpperCase();const P={HIMBIO:50,CHEM:30,BIO:30};S.pc=S.pc||[];
+  if(!P[c])return alert('Неверный промокод');if(S.pc.includes(c))return alert('Уже использован');
+  S.pc.push(c);S.gem+=P[c];save();snd('coin');shop()});
+}
+// ===== «Ещё»: центр практики, таблица, настройки
+function more(){
+ tab(5);
+ $('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()">${[['🏋️','Центр практики','prac()'],['🧪','Таблица Менделеева','ptab()'],['📊','Оценка знаний','assess()']].map(r=>`<div class="card" style="margin:8px 0;font-size:18px" onclick="cl();${r[2]}">${r[0]} ${r[1]}</div>`).join('')}</div></div>`;
+}
+function prac(){
+ tab(5);
+ $('#app').innerHTML=hdr()+`<div class="qb" style="background:#1cb0f6"><h2>Тренировка</h2>Отрабатывай ошибки и закрепляй пройденное</div><div class="card" style="margin-top:16px">Смешанная тренировка<button class="btn" style="margin-top:10px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="mix()">Начать: +10 XP</button></div><div class="mod" style="margin-top:20px">Отработка навыков</div><div class="card" style="margin-top:14px;font-size:18px" onclick="practice()">🔁 Ошибки <b style="float:right;color:#ff9600">${(S.mis||[]).length}</b></div><div class="card" style="font-size:18px" onclick="ptab()">🧪 Таблица Менделеева</div>`;
+}
+function mix(){
+ const q=U.flatMap((u,i)=>u.s==S.sec&&[0,1,2].some(j=>S.done[i+'-'+j])?u.q.map((q,n)=>({q,k:i+'.'+n})):[]);
+ if(!q.length)return alert('Сначала пройди хотя бы один урок');
+ begin('mix',sh(q).slice(0,8));
+}
+const EL='H|Водород|1|1,008|н;He|Гелий|2|4,003|г;Li|Литий|3|6,94|м;Be|Бериллий|4|9,012|м;B|Бор|5|10,81|н;C|Углерод|6|12,01|н;N|Азот|7|14,01|н;O|Кислород|8|16,00|н;F|Фтор|9|19,00|н;Ne|Неон|10|20,18|г;Na|Натрий|11|22,99|м;Mg|Магний|12|24,31|м;Al|Алюминий|13|26,98|м;Si|Кремний|14|28,09|н;P|Фосфор|15|30,97|н;S|Сера|16|32,06|н;Cl|Хлор|17|35,45|н;Ar|Аргон|18|39,95|г;K|Калий|19|39,10|м;Ca|Кальций|20|40,08|м;Fe|Железо|26|55,85|м;Cu|Медь|29|63,55|м;Zn|Цинк|30|65,38|м;Br|Бром|35|79,90|н;Ag|Серебро|47|107,87|м;I|Иод|53|126,90|н;Au|Золото|79|196,97|м;Hg|Ртуть|80|200,59|м;Pb|Свинец|82|207,2|м;U|Уран|92|238,03|м'.split(';').map(x=>x.split('|'));
+const CL={'м':'#1cb0f6','н':'#58cc02','г':'#ce82ff'};
+function ptab(){
+ tab(5);
+ $('#app').innerHTML=hdr()+`<div class="lh"><button class="x" onclick="prac()">✕</button><b style="flex:1;text-align:center;font-size:18px">Таблица Менделеева</b></div><button class="btn" style="margin:6px 0 14px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="fnd()">🎯 Найди элемент</button><div id="ed" class="card" style="min-height:76px">Нажми на элемент. <span style="color:#1cb0f6">■ металлы</span> <span style="color:#58cc02">■ неметаллы</span> <span style="color:#ce82ff">■ благородные газы</span></div><div class="el">${EL.map((e,i)=>`<button class="e" style="border-color:${CL[e[4]]}" onclick="ei(${i})"><small>${e[2]}</small><b>${e[0]}</b></button>`).join('')}</div>`;
+}
+function ei(i){const e=EL[i];snd('tap');$('#ed').innerHTML=`<b style="font-size:22px">${e[0]} · ${e[1]}</b><br>Порядковый номер: ${e[2]}<br>Атомная масса: ${e[3]}<br>${{'м':'Металл','н':'Неметалл','г':'Благородный газ'}[e[4]]}`}
+let F;
+function fnd(){F={n:0,ok:0};fq()}
+function fq(){
+ F.t=Math.random()*EL.length|0;
+ $('#app').innerHTML=hdr()+`<div class="lh"><button class="x" onclick="ptab()">✕</button><div class="bar"><i style="width:${F.n*10}%"></i></div></div><div class="q">Найди: ${EL[F.t][1]} (${F.n+1}/10)</div><div class="el">${EL.map((e,i)=>`<button class="e" style="border-color:${CL[e[4]]}" onclick="fa(${i})"><b>${e[0]}</b></button>`).join('')}</div>`;
+}
+function fa(i){
+ const ok=i==F.t;snd(ok?'ok':'no');F.n++;if(ok)F.ok++;
+ if(F.n>=10){S.gem+=F.ok;S.xp+=F.ok*2;save();alert(`Верно: ${F.ok}/10 · +${F.ok} 💎`);return ptab()}
+ fq();
+}
+function sett(){
+ tab(9);
+ $('#app').innerHTML=bar('Настройки',['',''],['ГОТОВО','prof()'])+`<h3>Аккаунт</h3><div class="lst">${[['Аккаунт и друзья','acc()'],['Параметры','sp()'],['Профиль','prof()'],['Уведомления','sn()'],['Оценка знаний','assess()'],['Экспорт прогресса','exp_()'],['Импорт прогресса','imp()'],['Установить как приложение','inst()']].map(r=>`<div class="rw" onclick="${r[1]}">${r[0]}<span>›</span></div>`).join('')}</div><h3>Поддержка</h3><div class="lst"><div class="rw" onclick="alert('Проходи уроки по порядку, сдавай экзамены разделов, открывай сундуки и держи ударный режим каждый день.')">Справочный центр<span>›</span></div><div class="rw" onclick="fb()">Отправить отзыв<span>›</span></div></div><button class="btn gh" style="margin-top:24px;color:var(--r)" onclick="yn('Сбросить прогресс?','Все данные будут стёрты.','Сбросить','resetAll()')">Сбросить прогресс</button>`;
+}
+function sp(){
+ const on=k=>k=='mute'?!S.mute:!(S.off||{})[k];tab(9);
+ $('#app').innerHTML=bar('Параметры',['←','sett()'],['',''])+'<h3>Учебный процесс</h3><div class="lst">'+[['Звуковые эффекты','mute'],['Вибрация','vib'],['Анимация','anm'],['Мотивирующие подсказки','hnt']].map(r=>`<div class="rw" onclick="tg('${r[1]}')">${r[0]}<span class="sw ${on(r[1])?'on':''}"></span></div>`).join('')+`<div class="rw" onclick="th()">Тема<span style="color:var(--mut)">${{a:'авто',l:'светлая',d:'тёмная'}[S.th||'a']}</span></div></div>`;
+}
+function tg(k){if(k=='mute')S.mute=!S.mute;else{S.off=S.off||{};S.off[k]=!S.off[k]}save();ath();snd('ok');sp()}
+function sn(){strk();setTimeout(()=>$('#rt').scrollIntoView(),60)}
+function fb(){ask('Что улучшить в приложении?','',t=>{if(t){S.fbk=(S.fbk||[]).concat(t);save();alert('Спасибо! Отзыв сохранён.')}})}
+function th(){S.th={a:'l',l:'d',d:'a'}[S.th||'a'];save();ath();sp()}
+function ath(){document.documentElement.dataset.th=S.th||'a';document.body.classList.toggle('noanim',!!(S.off||{}).anm)}
+function exp_(){const c=btoa(unescape(encodeURIComponent(JSON.stringify(S))));navigator.clipboard?navigator.clipboard.writeText(c).then(()=>alert('Код скопирован. Сохрани его в заметках.'),()=>ask('Скопируй код',c,()=>{})):ask('Скопируй код',c,()=>{})}
+function imp(){ask('Вставь код прогресса','',c=>{if(!c)return;try{S=JSON.parse(decodeURIComponent(escape(atob(c))));save();location.reload()}catch(e){alert('Неверный код')}})}
+// смена недели: повышение/понижение в лиге
+if(S.wk!==undefined&&S.wk!==wk()&&S.wxp>0){const r=S.tok&&S.lr?S.lr:board(S.wk,1).findIndex(x=>x.me)+1;if(r<=10)S.lg=Math.min(LG.length-1,(S.lg||0)+1);else if(r>=26)S.lg=Math.max(0,(S.lg||0)-1)}
+if(S.wk!==wk()){S.wk=wk();S.wxp=0;save()}
+ath();document.addEventListener('visibilitychange',()=>{save();sync()});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+home();
+</script>
+</body>
+</html>
