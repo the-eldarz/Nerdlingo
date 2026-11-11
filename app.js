@@ -310,7 +310,7 @@ function assess(){
 function toast(m){const d=document.createElement('div');d.className='toast';d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),3000)}
 window.alert=toast;
 let AQ;
-function ask(t,v,cb){AQ=cb;$('#pp').innerHTML=`<div class="ov" style="align-items:center"><div class="ctr2" style="text-align:left"><b style="font-size:18px">${t}</b><input id="ai" class="in" style="margin:12px 0" value="${(v||'').replace(/"/g,'&quot;')}"><button class="btn" onclick="const v=$('#ai').value.trim();cl();AQ(v)">OK</button><button class="btn gh" onclick="cl()">Отмена</button></div></div>`;setTimeout(()=>$('#ai').focus(),60)}
+function ask(t,v,cb){AQ=cb;$('#pp').innerHTML=`<div class="ov" style="align-items:center"><div class="ctr2" style="text-align:left"><b style="font-size:18px">${t}</b><input id="ai" class="in" style="margin:12px 0" value="${(v||'').replace(/"/g,'&quot;')}"><button class="btn" onclick="const v=$('#ai').value.trim();cl();AQ(v)">OK</button><button class="btn gh" onclick="cl()">Отмена</button></div></div>`;setTimeout(()=>{const e=$('#ai');e&&e.focus()},60)}
 function yn(t,d,l,js){$('#pp').innerHTML=`<div class="ov" onclick="cl()"><div class="sheet" onclick="event.stopPropagation()"><b style="font-size:20px">${t}</b><div style="color:var(--mut);margin:8px 0">${d}</div><button class="btn" onclick="cl()">Остаться</button><button class="btn gh" style="color:var(--r)" onclick="cl();${js}">${l}</button></div></div>`}
 const qx=()=>yn('Выйти из урока?','Прогресс этого урока не сохранится.','Выйти','home()');
 function resetAll(){S={xp:0,streak:0,best:0,last:'',done:{},hist:{},sec:0,gem:0,fz:0,gold:{},jmp:{},since:T(0)};save();location.reload()}
@@ -330,9 +330,14 @@ const eye=id=>{const e=$('#'+id);e.type=e.type=='password'?'text':'password'};
 function pe(){
  if(!S.tok)return acc();
  tab(9);
- $('#app').innerHTML=bar('Профиль',['←','sett()'],['',''])+`<div style="text-align:center;margin:10px">${av('big')}<div style="color:var(--b);margin-top:8px" onclick="avEd()">ИЗМЕНИТЬ АВАТАР</div></div><div class="lst">${[['Имя пользователя','@'+S.un,'chUn()'],['Пароль','••••••••','pwScr()'],['Электронная почта',S.em||'—','']].map(r=>`<div class="rw" onclick="${r[2]}"><span>${r[0]}</span><span style="color:var(--mut)">${r[1]}</span></div>`).join('')}</div><div class="lst" style="margin-top:16px">${[['🔄 Синхронизировать',"syncNow().then(()=>toast('Синхронизировано'))"],['⬇️ Загрузить прогресс с сервера','pull()'],['👥 Друзья','frs()'],['ЭКСПОРТИРОВАТЬ ДАННЫЕ','exp_()']].map(r=>`<div class="rw" style="color:var(--b)" onclick="${r[1]}">${r[0]}</div>`).join('')}</div><div class="lst" style="margin-top:16px"><div class="rw" style="color:var(--r)" onclick="yn('Выйти из аккаунта?','Прогресс останется на сервере.','Выйти','S.tok=\\'\\';S.un=\\'\\';save();sett()')">ВЫЙТИ</div></div>`;
+ $('#app').innerHTML=bar('Профиль',['←','sett()'],['',''])+`<div style="text-align:center;margin:10px">${av('big')}<div style="color:var(--b);margin-top:8px" onclick="avEd()">ИЗМЕНИТЬ АВАТАР</div></div><div class="lst">${[['Имя пользователя','@'+S.un,'chUn()'],['Пароль','••••••••','pwScr()'],['Электронная почта',S.em||'Добавить','chEm()']].map(r=>`<div class="rw" onclick="${r[2]}"><span>${r[0]}</span><span style="color:var(--mut)">${r[1]}</span></div>`).join('')}</div><div class="lst" style="margin-top:16px">${[['👥 Друзья','frs()'],['ЭКСПОРТИРОВАТЬ ДАННЫЕ','exp_()']].map(r=>`<div class="rw" style="color:var(--b)" onclick="${r[1]}">${r[0]}</div>`).join('')}</div><div class="lst" style="margin-top:16px"><div class="rw" style="color:var(--r)" onclick="yn('Выйти из аккаунта?','Прогресс останется на сервере.','Выйти','S.lu=S.un;S.tok=\\'\\';S.un=\\'\\';RDY=0;save();sett()')">ВЫЙТИ</div></div>`;
 }
 function chName(){ask('Новое имя',S.name||'',n=>{if(n){S.name=n.slice(0,16);S.pts=Date.now();save();syncNow();pe()}})}
+function chEm(){
+ if(!S.tok){toast('Сначала войди в аккаунт');return acc()}
+ ask('Почта (пусто — удалить)',S.em||'',async e=>{e=e.trim().toLowerCase();if(e==(S.em||''))return;if(e&&!EMR.test(e))return toast('Проверь почту: она введена с ошибкой');
+  try{const r=await api('/email',{t:S.tok,e});S.em=r&&r.e!==undefined?r.e:e;save();toast(e?'Почта сохранена':'Почта удалена');pe()}catch(x){toast(x.message)}});
+}
 function chUn(){
  if(!S.tok){toast('Сначала войди в аккаунт');return acc()}
  ask('Новый юзернейм (@…)','@'+S.un,async u=>{u=u.replace(/^@/,'').toLowerCase();if(!u||u==S.un)return;try{await api('/rename',{t:S.tok,u});S.un=u;save();toast('Юзернейм изменён');pe()}catch(e){toast(e.message)}});
@@ -381,6 +386,7 @@ async function autoSync(manual){
    NSY=1;S=m;save();NSY=0;
    if(adv){toast('☁️ Прогресс обновлён с другого устройства');refreshHome()}
   }
+  if(r.e!==undefined&&r.e!==(S.em||'')){S.em=r.e;NSY=1;save();NSY=0}
   RDY=1;await syncNow();LSY=Date.now();
  }catch(e){if(manual)throw e}
  finally{SYB=0;NSY=0}
@@ -389,13 +395,16 @@ let AM='in';
 function un(el){if(AM=='up'){const v=el.value.replace(/@/g,'').toLowerCase();el.value=v?'@'+v:''}}
 function acc(){
  tab(9);const B=bar('Аккаунт',['←','sett()'],['','']);
- $('#app').innerHTML=B+(S.tok?`<div class="card" style="text-align:center">${av('big')}<h2>@${S.un}</h2><div style="color:var(--mut);font-size:14px;margin-bottom:12px">☁️ Автосинхронизация включена${LSY?' · '+new Date(LSY).toTimeString().slice(0,5):''}</div><button class="btn" onclick="autoSync(1).then(()=>toast('Синхронизировано'),e=>toast(e.message))">🔄 Синхронизировать сейчас</button><button class="btn" style="margin-top:10px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="pull()">⬇️ Загрузить прогресс с сервера</button><button class="btn gh" style="color:var(--r)" onclick="S.lu=S.un;S.tok='';S.un='';RDY=0;save();acc()">Выйти</button></div><div class="card" onclick="frs()">👥 Друзья</div>`:`<div class="tabs"><button class="${AM=='in'?'on':''}" onclick="AM='in';acc()">Вход</button><button class="${AM=='up'?'on':''}" onclick="AM='up';acc()">Регистрация</button></div><div class="card">${AM=='up'?'<input id="ae" class="in" type="email" placeholder="Почта" autocapitalize="off">':''}<input id="an" class="in" style="margin-top:10px" placeholder="${AM=='up'?'@юзернейм':'@юзернейм или почта'}" autocapitalize="off" oninput="un(this)"><div style="margin-top:10px">${pwf('ap','Пароль (от 6 символов)')}</div>${AM=='up'?`<div style="margin-top:10px">${pwf('ap2','Повтори пароль')}</div>`:''}<button class="btn" style="margin-top:12px" onclick="auth()">${AM=='up'?'Создать аккаунт':'Войти'}</button><div style="color:var(--mut);font-size:13px;margin-top:10px">Юзернейм уникален: по нему друзья найдут тебя. Если он занят, придумай другой.</div><button class="btn gh" onclick="ping()">Проверить связь с сервером</button></div>`);
+ $('#app').innerHTML=B+(S.tok?`<div class="card" style="text-align:center">${av('big')}<h2>@${S.un}</h2><div style="color:var(--mut);font-size:14px;margin-bottom:12px">☁️ Автосинхронизация включена${LSY?' · '+new Date(LSY).toTimeString().slice(0,5):''}</div><button class="btn gh" style="color:var(--r)" onclick="S.lu=S.un;S.tok='';S.un='';RDY=0;save();acc()">Выйти</button></div><div class="card" onclick="frs()">👥 Друзья</div>`:`<div class="tabs"><button class="${AM=='in'?'on':''}" onclick="AM='in';acc()">Вход</button><button class="${AM=='up'?'on':''}" onclick="AM='up';acc()">Регистрация</button></div><div class="card">${AM=='up'?'<input id="ae" class="in" type="email" placeholder="Почта (необязательно)" autocapitalize="off">':''}<input id="an" class="in" style="margin-top:10px" placeholder="${AM=='up'?'@юзернейм':'@юзернейм или почта'}" autocapitalize="off" oninput="un(this)"><div style="margin-top:10px">${pwf('ap','Пароль (от 6 символов)')}</div>${AM=='up'?`<div style="margin-top:10px">${pwf('ap2','Повтори пароль')}</div>`:''}<button class="btn" style="margin-top:12px" onclick="auth()">${AM=='up'?'Создать аккаунт':'Войти'}</button><div style="color:var(--mut);font-size:13px;margin-top:10px">Юзернейм уникален: по нему друзья найдут тебя. Почту можно не указывать — добавишь позже в профиле.</div><button class="btn gh" onclick="ping()">Проверить связь с сервером</button></div>`);
 }
+const EMR=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 async function auth(){
  const id=$('#an').value.trim().toLowerCase().replace(/^@/,''),p=$('#ap').value;
  if(AM=='up'&&p!==$('#ap2').value)return toast('Пароли не совпадают');
- try{const r=AM=='up'?await api('/register',{u:id,e:$('#ae').value.trim().toLowerCase(),p}):await api('/login',{id,p});
-  const prev=S.lu,ob=S.ob;S.tok=r.t;S.un=r.u;S.em=r.e||S.em;
+ const em=AM=='up'?$('#ae').value.trim().toLowerCase():'';
+ if(em&&!EMR.test(em))return toast('Проверь почту: она введена с ошибкой');
+ try{const r=AM=='up'?await api('/register',{u:id,e:em,p}):await api('/login',{id,p});
+  const prev=S.lu,ob=S.ob;S.tok=r.t;S.un=r.u;S.em=r.e||'';
   try{const o=r.b?JSON.parse(r.b):null;
    if(prev&&prev!==r.u)S={...(o||{xp:0,streak:0,best:0,last:'',done:{},hist:{},sec:0,gem:0,fz:0,gold:{},jmp:{},since:T(0)}),tok:S.tok,un:S.un,em:S.em,ob:ob||1};
    else if(o)S=mergeS(S,o)}catch(e){}
