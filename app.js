@@ -17,7 +17,8 @@ const LVN=['Начинаем','Основы','Уверенный уровень'
 const lv=n=>{const m=17*U.filter(u=>u.s==n).length,t=[...new Set([5,10,20,Math.round(m*.4),Math.round(m*.7),m])].filter(x=>x<=m).sort((a,b)=>a-b);return t.map((x,k)=>[x,LVN[Math.min(k,5)]])};
 try{const m={name:'Nerdlingo',short_name:'Nerdlingo',display:'standalone',start_url:location.href,background_color:'#131f24',theme_color:'#58cc02',icons:[]};const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));document.head.appendChild(l)}catch(e){}
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.dp=e});
-const save=()=>{try{localStorage.setItem('cb',JSON.stringify(S))}catch(e){}};
+var NSY=0,RDY=0,SYB=0,LSY=0,st;
+const save=()=>{try{localStorage.setItem('cb',JSON.stringify(S))}catch(e){}if(!NSY&&!document.body.classList.contains('les'))sync()};
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const isC=q=>q[0]!='m'&&Array.isArray(q[1]);
 let L;
@@ -345,32 +346,61 @@ async function chPw(){
  if(n.length<6)return toast('Пароль не короче 6 символов');if(n!==c2)return toast('Пароли не совпадают');
  try{await api('/passwd',{t:S.tok,o,n});toast('Пароль изменён');pe()}catch(e){toast(e.message)}
 }
-async function api(p,b){
- let r;try{r=await fetch(API+p,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(b||{})})}catch(e){throw new Error('Нет связи с сервером. Проверь интернет или VPN')}
+async function api(p,b,ka){
+ let r;try{r=await fetch(API+p,{method:'POST',keepalive:!!ka,headers:{'Content-Type':'text/plain'},body:JSON.stringify(b||{})})}catch(e){throw new Error('Нет связи с сервером. Проверь интернет или VPN')}
  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.e||'Ошибка сервера ('+r.status+')');return j;
 }
 async function ping(){try{const r=await fetch(API+'/ping');toast(r.ok?'Сервер доступен ✅':'Сервер ответил: '+r.status)}catch(e){toast('Нет связи с сервером ❌')}}
-let st;function sync(){if(!S.tok)return;clearTimeout(st);st=setTimeout(syncNow,3000)}
-async function syncNow(){
- if(!S.tok)return;const b={...S};delete b.tok;
- try{await api('/sync',{t:S.tok,d:{xp:S.xp,streak:S.streak,best:S.best||0,wxp:S.wxp||0,wk:S.wk,lg:S.lg||0,av:S.pa?avCode(S.pa):(S.av||'🧑‍🔬'),avc:S.avc||'#ddf4ff',name:S.name||S.un},b:JSON.stringify(b)})}catch(e){}
+function sync(){if(!S.tok||!RDY)return;clearTimeout(st);st=setTimeout(syncNow,3000)}
+// отправка на сервер — только после успешной загрузки (иначе устаревшие данные затёрли бы облако)
+async function syncNow(ka){
+ if(!S.tok||!RDY)return;S.ts=Date.now();const b={...S};delete b.tok;
+ try{await api('/sync',{t:S.tok,d:{xp:S.xp,streak:S.streak,best:S.best||0,wxp:S.wxp||0,wk:S.wk,lg:S.lg||0,av:S.pa?avCode(S.pa):(S.av||'🧑‍🔬'),avc:S.avc||'#ddf4ff',name:S.name||S.un},b:JSON.stringify(b)},ka);try{localStorage.setItem('cb',JSON.stringify(S))}catch(e){}}catch(e){}
+}
+// слияние локального прогресса (a) и серверного (b): ничего не теряется
+const DEV=['th','mute','off','notif','rt','nl','ob','api','tok','un','em','lu','sec'];
+function mergeS(a,b){
+ const rw=(b.xp||0)>(a.xp||0)||((b.xp||0)==(a.xp||0)&&(b.ts||0)>(a.ts||0)),r={...(rw?b:a)};
+ ['done','gold','mc','hist','ac','chs'].forEach(k=>{if(!(k in a)&&!(k in b))return;const x=a[k]||{},y=b[k]||{},o={...y,...x};for(const i in o)if(typeof x[i]=='number'&&typeof y[i]=='number')o[i]=Math.max(x[i],y[i]);r[k]=o});
+ ['pc','own'].forEach(k=>{if(a[k]||b[k])r[k]=[...new Set([...(a[k]||[]),...(b[k]||[])])]});
+ r.best=Math.max(a.best||0,b.best||0);r.ts=Math.max(a.ts||0,b.ts||0);
+ DEV.forEach(k=>{if(k in a)r[k]=a[k];else delete r[k]});
+ return r;
+}
+function refreshHome(){const on=[...document.querySelectorAll('.nav button')].findIndex(x=>x.className=='on');if(!document.body.classList.contains('les')&&on===0)home()}
+// автосинхронизация: сначала забираем облако и сливаем, потом отправляем
+async function autoSync(manual){
+ if(!S.tok||SYB)return;SYB=1;
+ try{
+  const r=await api('/pull',{t:S.tok});
+  if(r.b){
+   const o=JSON.parse(r.b),m=mergeS(S,o),adv=(o.xp||0)>(S.xp||0)||Object.keys(o.done||{}).some(k=>!(S.done||{})[k]);
+   NSY=1;S=m;save();NSY=0;
+   if(adv){toast('☁️ Прогресс обновлён с другого устройства');refreshHome()}
+  }
+  RDY=1;await syncNow();LSY=Date.now();
+ }catch(e){if(manual)throw e}
+ finally{SYB=0;NSY=0}
 }
 let AM='in';
 function un(el){if(AM=='up'){const v=el.value.replace(/@/g,'').toLowerCase();el.value=v?'@'+v:''}}
 function acc(){
  tab(9);const B=bar('Аккаунт',['←','sett()'],['','']);
- $('#app').innerHTML=B+(S.tok?`<div class="card" style="text-align:center">${av('big')}<h2>@${S.un}</h2><button class="btn" onclick="syncNow().then(()=>toast('Синхронизировано'))">🔄 Синхронизировать</button><button class="btn" style="margin-top:10px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="pull()">⬇️ Загрузить прогресс с сервера</button><button class="btn gh" style="color:var(--r)" onclick="S.tok='';S.un='';save();acc()">Выйти</button></div><div class="card" onclick="frs()">👥 Друзья</div>`:`<div class="tabs"><button class="${AM=='in'?'on':''}" onclick="AM='in';acc()">Вход</button><button class="${AM=='up'?'on':''}" onclick="AM='up';acc()">Регистрация</button></div><div class="card">${AM=='up'?'<input id="ae" class="in" type="email" placeholder="Почта" autocapitalize="off">':''}<input id="an" class="in" style="margin-top:10px" placeholder="${AM=='up'?'@юзернейм':'@юзернейм или почта'}" autocapitalize="off" oninput="un(this)"><div style="margin-top:10px">${pwf('ap','Пароль (от 6 символов)')}</div>${AM=='up'?`<div style="margin-top:10px">${pwf('ap2','Повтори пароль')}</div>`:''}<button class="btn" style="margin-top:12px" onclick="auth()">${AM=='up'?'Создать аккаунт':'Войти'}</button><div style="color:var(--mut);font-size:13px;margin-top:10px">Юзернейм уникален: по нему друзья найдут тебя. Если он занят, придумай другой.</div><button class="btn gh" onclick="ping()">Проверить связь с сервером</button></div>`);
+ $('#app').innerHTML=B+(S.tok?`<div class="card" style="text-align:center">${av('big')}<h2>@${S.un}</h2><div style="color:var(--mut);font-size:14px;margin-bottom:12px">☁️ Автосинхронизация включена</div><button class="btn" onclick="autoSync(1).then(()=>toast('Синхронизировано'),e=>toast(e.message))">🔄 Синхронизировать сейчас</button><button class="btn" style="margin-top:10px;background:var(--b);box-shadow:0 4px 0 #1899d6" onclick="pull()">⬇️ Загрузить прогресс с сервера</button><button class="btn gh" style="color:var(--r)" onclick="S.lu=S.un;S.tok='';S.un='';RDY=0;save();acc()">Выйти</button></div><div class="card" onclick="frs()">👥 Друзья</div>`:`<div class="tabs"><button class="${AM=='in'?'on':''}" onclick="AM='in';acc()">Вход</button><button class="${AM=='up'?'on':''}" onclick="AM='up';acc()">Регистрация</button></div><div class="card">${AM=='up'?'<input id="ae" class="in" type="email" placeholder="Почта" autocapitalize="off">':''}<input id="an" class="in" style="margin-top:10px" placeholder="${AM=='up'?'@юзернейм':'@юзернейм или почта'}" autocapitalize="off" oninput="un(this)"><div style="margin-top:10px">${pwf('ap','Пароль (от 6 символов)')}</div>${AM=='up'?`<div style="margin-top:10px">${pwf('ap2','Повтори пароль')}</div>`:''}<button class="btn" style="margin-top:12px" onclick="auth()">${AM=='up'?'Создать аккаунт':'Войти'}</button><div style="color:var(--mut);font-size:13px;margin-top:10px">Юзернейм уникален: по нему друзья найдут тебя. Если он занят, придумай другой.</div><button class="btn gh" onclick="ping()">Проверить связь с сервером</button></div>`);
 }
 async function auth(){
  const id=$('#an').value.trim().toLowerCase().replace(/^@/,''),p=$('#ap').value;
  if(AM=='up'&&p!==$('#ap2').value)return toast('Пароли не совпадают');
  try{const r=AM=='up'?await api('/register',{u:id,e:$('#ae').value.trim().toLowerCase(),p}):await api('/login',{id,p});
-  S.tok=r.t;S.un=r.u;S.em=r.e||S.em;if(r.b){const o=JSON.parse(r.b);if((o.xp||0)>S.xp)S={...o,tok:S.tok,un:S.un}}
-  save();await syncNow();toast('Готово!');pe();
+  const prev=S.lu,ob=S.ob;S.tok=r.t;S.un=r.u;S.em=r.e||S.em;
+  try{const o=r.b?JSON.parse(r.b):null;
+   if(prev&&prev!==r.u)S={...(o||{xp:0,streak:0,best:0,last:'',done:{},hist:{},sec:0,gem:0,fz:0,gold:{},jmp:{},since:T(0)}),tok:S.tok,un:S.un,em:S.em,ob:ob||1};
+   else if(o)S=mergeS(S,o)}catch(e){}
+  S.lu=r.u;NSY=1;save();NSY=0;RDY=1;await syncNow();toast('Готово!');pe();
  }catch(e){toast(e.message)}
 }
 async function pull(){
- try{const r=await api('/pull',{t:S.tok});if(!r.b)return toast('На сервере пока нет данных');S={...JSON.parse(r.b),api:S.api,tok:S.tok,un:S.un};save();toast('Прогресс загружен');home()}catch(e){toast(e.message)}
+ try{const r=await api('/pull',{t:S.tok});if(!r.b)return toast('На сервере пока нет данных');S={...JSON.parse(r.b),api:S.api,tok:S.tok,un:S.un};NSY=1;save();NSY=0;RDY=1;toast('Прогресс загружен');home()}catch(e){toast(e.message)}
 }
 async function frs(){
  if(!S.tok){toast('Сначала войди в аккаунт (Настройки → Аккаунт)');return acc()}
@@ -492,7 +522,14 @@ function imp(){ask('Вставь код прогресса','',c=>{if(!c)return;
 // смена недели: повышение/понижение в лиге
 if(S.wk!==undefined&&S.wk!==wk()&&S.wxp>0){const r=S.tok&&S.lr?S.lr:board(S.wk,1).findIndex(x=>x.me)+1;if(r<=10)S.lg=Math.min(LG.length-1,(S.lg||0)+1);else if(r>=26)S.lg=Math.max(0,(S.lg||0)-1)}
 if(S.wk!==wk()){S.wk=wk();S.wxp=0;save()}
-ath();document.addEventListener('visibilitychange',()=>{save();sync()});
+ath();autoSync();
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){save();clearTimeout(st);syncNow(1)}
+ else if(Date.now()-LSY>20000)autoSync();
+});
+addEventListener('online',()=>autoSync());
+addEventListener('pagehide',()=>{clearTimeout(st);syncNow(1)});
+setInterval(()=>{if(!document.hidden&&!document.body.classList.contains('les'))autoSync()},120000);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 
 home();
