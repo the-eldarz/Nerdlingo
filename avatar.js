@@ -162,7 +162,7 @@ function avRnd(){const R=n=>Math.random()*n|0;KS.forEach(k=>D[k]=R(LM[k]));D.sk=
 function avCancel(){document.body.classList.remove('les');prof()}
 function avOk(){
  if(D.em){S.pa=null;S.av=D.em}else{S.pa={};KS.forEach(k=>S.pa[k]=D[k])}
- S.avc=D.bg;save();document.body.classList.remove('les');
+ S.avc=D.bg;S.pts=Date.now();save();document.body.classList.remove('les');
  try{if(S.tok)syncNow()}catch(e){}
  prof();
 }
